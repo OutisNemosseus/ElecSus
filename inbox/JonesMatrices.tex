@@ -1,0 +1,278 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{physics}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{geometry}
+\usepackage{hyperref}
+\usepackage{booktabs}
+
+\geometry{margin=1in}
+
+\lstset{
+    language=Python,
+    basicstyle=\ttfamily\small,
+    keywordstyle=\color{blue},
+    commentstyle=\color{green!60!black},
+    stringstyle=\color{orange},
+    numbers=left,
+    numberstyle=\tiny\color{gray},
+    breaklines=true,
+    frame=single,
+    backgroundcolor=\color{gray!10}
+}
+
+\newtheorem{axiom}{Axiom}
+\newtheorem{definition}{Definition}
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}{Lemma}
+\newtheorem{corollary}{Corollary}
+
+\title{\textbf{JonesMatrices.py} \\ Polarization Optics \\ \large Jones Calculus for Polarizers}
+\author{ElecSus Library Documentation}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+This document provides comprehensive documentation for \texttt{JonesMatrices.py}, which implements Jones matrices for polarization analysis. The module provides polarizer matrices in both linear ($x$-$y$) and circular ($L$-$R$) bases, essential for modeling polarization-sensitive atomic spectroscopy experiments.
+\end{abstract}
+
+\tableofcontents
+\newpage
+
+%==============================================================================
+\section{Theoretical Foundation}
+%==============================================================================
+
+\subsection{Jones Vector Formalism}
+
+\begin{axiom}[Polarization State Representation]
+A fully polarized monochromatic light beam can be represented by a complex 2-component vector:
+\begin{equation}
+\vec{E} = \begin{pmatrix} E_x \\ E_y \end{pmatrix} = \begin{pmatrix} |E_x| e^{i\phi_x} \\ |E_y| e^{i\phi_y} \end{pmatrix}
+\end{equation}
+in the linear basis, or equivalently in the circular basis.
+\end{axiom}
+
+\begin{definition}[Linear Basis States]
+In the $x$-$y$ (horizontal-vertical) basis:
+\begin{equation}
+\hat{x} = \begin{pmatrix} 1 \\ 0 \end{pmatrix}, \quad \hat{y} = \begin{pmatrix} 0 \\ 1 \end{pmatrix}
+\end{equation}
+\end{definition}
+
+\begin{definition}[Circular Basis States]
+Left and right circular polarizations:
+\begin{equation}
+\hat{L} = \frac{1}{\sqrt{2}}\begin{pmatrix} 1 \\ -i \end{pmatrix}, \quad \hat{R} = \frac{1}{\sqrt{2}}\begin{pmatrix} 1 \\ i \end{pmatrix}
+\end{equation}
+In the $L$-$R$ basis representation:
+\begin{equation}
+\hat{L} \rightarrow \begin{pmatrix} 1 \\ 0 \end{pmatrix}, \quad \hat{R} \rightarrow \begin{pmatrix} 0 \\ 1 \end{pmatrix}
+\end{equation}
+\end{definition}
+
+\subsection{Jones Matrix Formalism}
+
+\begin{theorem}[Optical Element Action]
+A polarization-transforming optical element is represented by a $2 \times 2$ matrix:
+\begin{equation}
+\vec{E}_{out} = M \cdot \vec{E}_{in}
+\end{equation}
+\end{theorem}
+
+\begin{definition}[Polarizer Matrix]
+An ideal polarizer transmitting polarization $\hat{p}$ has Jones matrix:
+\begin{equation}
+P = \hat{p} \hat{p}^\dagger = |\hat{p}\rangle\langle\hat{p}|
+\end{equation}
+This is a projection operator satisfying $P^2 = P$.
+\end{definition}
+
+\subsection{Basis Transformation}
+
+\begin{theorem}[Basis Change Matrix]
+The transformation from $x$-$y$ to $L$-$R$ basis:
+\begin{equation}
+U = \frac{1}{\sqrt{2}}\begin{pmatrix} 1 & 1 \\ -i & i \end{pmatrix}
+\end{equation}
+A Jones matrix transforms as: $M_{LR} = U M_{xy} U^\dagger$.
+\end{theorem}
+
+%==============================================================================
+\section{Line-by-Line Code Analysis}
+%==============================================================================
+
+\subsection{Module Imports}
+
+\begin{lstlisting}
+import numpy as np
+\end{lstlisting}
+\textit{NumPy for matrix operations.}
+
+\subsection{Horizontal Polarizer}
+
+\begin{lstlisting}
+# Horizontal polarisers (P_x)
+HorizPol_xy = np.matrix([[1,0],[0,0]])
+HorizPol_lr = 1./2 * np.matrix([[1,1],[1,1]])
+\end{lstlisting}
+
+In the $x$-$y$ basis:
+\begin{equation}
+P_x = \begin{pmatrix} 1 & 0 \\ 0 & 0 \end{pmatrix} = |\hat{x}\rangle\langle\hat{x}|
+\end{equation}
+
+In the $L$-$R$ basis:
+\begin{equation}
+P_x = \frac{1}{2}\begin{pmatrix} 1 & 1 \\ 1 & 1 \end{pmatrix}
+\end{equation}
+\textit{Horizontal polarizer passes $\hat{x}$ polarization, blocks $\hat{y}$.}
+
+\subsection{Vertical Polarizer}
+
+\begin{lstlisting}
+# Vertical polarisers (P_y)
+VertPol_xy = np.matrix([[0,0],[0,1]])
+VertPol_lr = 1./2 * np.matrix([[1,-1],[-1,1]])
+\end{lstlisting}
+
+In the $x$-$y$ basis:
+\begin{equation}
+P_y = \begin{pmatrix} 0 & 0 \\ 0 & 1 \end{pmatrix} = |\hat{y}\rangle\langle\hat{y}|
+\end{equation}
+
+\subsection{$+45°$ Linear Polarizer}
+
+\begin{lstlisting}
+# Linear polarisers at plus 45 degrees wrt x-axis
+LPol_P45_xy = 1./2 * np.matrix([[1,1],[1,1]])
+LPol_P45_lr = 1./2 * np.matrix([[1,-1.j],[1.j,1]])
+\end{lstlisting}
+
+The $+45°$ polarization state:
+\begin{equation}
+\hat{d} = \frac{1}{\sqrt{2}}\begin{pmatrix} 1 \\ 1 \end{pmatrix}
+\end{equation}
+
+Jones matrix:
+\begin{equation}
+P_{+45°} = \frac{1}{2}\begin{pmatrix} 1 & 1 \\ 1 & 1 \end{pmatrix}
+\end{equation}
+
+\subsection{$-45°$ Linear Polarizer}
+
+\begin{lstlisting}
+# Linear polarisers at minus 45 degrees wrt x-axis
+LPol_M45_xy = 1./2 * np.matrix([[1,-1],[-1,1]])
+LPol_M45_lr = 1./2 * np.matrix([[1,1.j],[-1.j,1]])
+\end{lstlisting}
+
+The $-45°$ polarization state:
+\begin{equation}
+\hat{a} = \frac{1}{\sqrt{2}}\begin{pmatrix} 1 \\ -1 \end{pmatrix}
+\end{equation}
+
+\subsection{Circular Polarizers}
+
+\begin{lstlisting}
+# Left Circular polariser (in circular basis only)
+CPol_L_lr = np.matrix([[1,0],[0,0]])
+CPol_R_lr = np.matrix([[0,0],[0,1]])
+\end{lstlisting}
+
+In the $L$-$R$ basis:
+\begin{equation}
+P_L = \begin{pmatrix} 1 & 0 \\ 0 & 0 \end{pmatrix}, \quad P_R = \begin{pmatrix} 0 & 0 \\ 0 & 1 \end{pmatrix}
+\end{equation}
+\textit{These are simple projection matrices in the circular basis.}
+
+%==============================================================================
+\section{Mathematical Properties}
+%==============================================================================
+
+\subsection{Projection Operator Properties}
+
+\begin{theorem}[Idempotency]
+All polarizer matrices satisfy:
+\begin{equation}
+P^2 = P
+\end{equation}
+Physically: passing light through two identical polarizers is equivalent to one.
+\end{theorem}
+
+\begin{theorem}[Orthogonality]
+Orthogonal polarizers satisfy:
+\begin{equation}
+P_\perp \cdot P = 0
+\end{equation}
+Example: $P_x \cdot P_y = 0$ (crossed polarizers block all light).
+\end{theorem}
+
+\subsection{Completeness}
+
+\begin{theorem}[Resolution of Identity]
+Orthogonal polarizer pairs sum to identity:
+\begin{equation}
+P_x + P_y = \mathbb{1}, \quad P_L + P_R = \mathbb{1}
+\end{equation}
+\end{theorem}
+
+%==============================================================================
+\section{Applications in Spectroscopy}
+%==============================================================================
+
+\subsection{Polarization Analysis}
+
+The Stokes parameters can be measured using these polarizers:
+\begin{align}
+S_0 &= I_x + I_y \\
+S_1 &= I_x - I_y \\
+S_2 &= I_{+45} - I_{-45} \\
+S_3 &= I_L - I_R
+\end{align}
+
+\subsection{Faraday Rotation Measurement}
+
+For small rotation angle $\theta$:
+\begin{equation}
+I_{out} = I_0 \sin^2\theta \approx I_0 \theta^2
+\end{equation}
+when measured with crossed polarizers.
+
+%==============================================================================
+\section{Summary}
+%==============================================================================
+
+The \texttt{JonesMatrices.py} module provides:
+
+\begin{table}[h]
+\centering
+\begin{tabular}{lcc}
+\toprule
+Polarizer & Variable (xy) & Variable (lr) \\
+\midrule
+Horizontal ($x$) & \texttt{HorizPol\_xy} & \texttt{HorizPol\_lr} \\
+Vertical ($y$) & \texttt{VertPol\_xy} & \texttt{VertPol\_lr} \\
+$+45°$ & \texttt{LPol\_P45\_xy} & \texttt{LPol\_P45\_lr} \\
+$-45°$ & \texttt{LPol\_M45\_xy} & \texttt{LPol\_M45\_lr} \\
+Left circular & -- & \texttt{CPol\_L\_lr} \\
+Right circular & -- & \texttt{CPol\_R\_lr} \\
+\bottomrule
+\end{tabular}
+\caption{Available polarizer matrices}
+\end{table}
+
+Key features:
+\begin{itemize}
+\item Matrices provided in both linear and circular bases
+\item All matrices are $2 \times 2$ complex NumPy matrices
+\item Follows conventions from Auzinsh, Budker, and Rochester (2010)
+\item Used for polarization analysis in ElecSus spectral calculations
+\end{itemize}
+
+\end{document}

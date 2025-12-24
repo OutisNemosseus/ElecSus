@@ -1,0 +1,312 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{physics}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{geometry}
+\usepackage{hyperref}
+\usepackage{booktabs}
+\usepackage{colortbl}
+
+\geometry{margin=1in}
+
+\lstset{
+    language=Python,
+    basicstyle=\ttfamily\small,
+    keywordstyle=\color{blue},
+    commentstyle=\color{green!60!black},
+    stringstyle=\color{orange},
+    numbers=left,
+    numberstyle=\tiny\color{gray},
+    breaklines=true,
+    frame=single,
+    backgroundcolor=\color{gray!10}
+}
+
+\newtheorem{axiom}{Axiom}
+\newtheorem{definition}{Definition}
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}{Lemma}
+\newtheorem{corollary}{Corollary}
+
+% Define Durham colors
+\definecolor{d_purple}{RGB}{126,49,123}
+\definecolor{d_lightpurple}{RGB}{216,172,244}
+\definecolor{d_midblue}{RGB}{145,184,189}
+\definecolor{d_olive}{RGB}{159,161,97}
+\definecolor{d_blue}{RGB}{0,99,136}
+\definecolor{d_red}{RGB}{170,43,74}
+\definecolor{d_yellow}{RGB}{232,227,145}
+\definecolor{d_lightblue}{RGB}{196,229,250}
+\definecolor{d_pink}{RGB}{196,59,142}
+\definecolor{d_grey}{RGB}{150,142,133}
+\definecolor{d_black}{RGB}{35,31,32}
+\definecolor{d_lightgrey}{RGB}{207,218,209}
+
+\title{\textbf{durhamcolours.py} \\ Durham University Color Palette \\ \large Consistent Styling for Scientific Visualizations}
+\author{ElecSus Library Documentation}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+This document provides documentation for \texttt{durhamcolours.py}, which defines a consistent color palette based on Durham University's corporate colors. The module provides RGB color specifications for use in matplotlib and other plotting libraries, ensuring professional and visually consistent scientific figures.
+\end{abstract}
+
+\tableofcontents
+\newpage
+
+%==============================================================================
+\section{Theoretical Foundation}
+%==============================================================================
+
+\subsection{Color Theory for Scientific Visualization}
+
+\begin{axiom}[Visual Distinction]
+Effective data visualization requires colors that are:
+\begin{enumerate}
+\item Distinguishable from each other
+\item Accessible to colorblind viewers
+\item Consistent across different media (print, screen)
+\end{enumerate}
+\end{axiom}
+
+\begin{definition}[RGB Color Model]
+Colors are specified as triples $(R, G, B)$ where each component is in $[0, 1]$:
+\begin{equation}
+\text{Color} = R \cdot \hat{r} + G \cdot \hat{g} + B \cdot \hat{b}
+\end{equation}
+Conversion from 8-bit values: $c_{norm} = c_{8bit} / 255$.
+\end{definition}
+
+\begin{theorem}[PANTONE to RGB Mapping]
+Corporate color standards (PANTONE) are converted to RGB for digital display:
+\begin{equation}
+(R, G, B)_{RGB} = f_{display}(\text{PANTONE code})
+\end{equation}
+This conversion is display-dependent but standardized for consistency.
+\end{theorem}
+
+\subsection{Design Principles}
+
+\begin{definition}[Color Harmony]
+The Durham palette includes:
+\begin{itemize}
+\item Primary colors: Purple, Blue
+\item Secondary colors: Red, Pink, Olive
+\item Neutral colors: Grey, Black, Light Grey
+\item Accent colors: Yellow, Light Blue, Light Purple
+\end{itemize}
+\end{definition}
+
+%==============================================================================
+\section{Color Definitions}
+%==============================================================================
+
+\subsection{Primary Palette}
+
+\begin{lstlisting}
+d_purple=[126.0/255.0,49.0/255.0,123.0/255.0]  # Palatinate Purple 255C
+d_blue  =[0,99.0/255.0,136.0/255.0]            # Blue 634C
+\end{lstlisting}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{lcccc}
+\toprule
+Color & Variable & RGB (0-255) & PANTONE & Preview \\
+\midrule
+Palatinate Purple & \texttt{d\_purple} & (126, 49, 123) & 255C & \cellcolor{d_purple} \\
+Blue & \texttt{d\_blue} & (0, 99, 136) & 634C & \cellcolor{d_blue} \\
+\bottomrule
+\end{tabular}
+\caption{Primary Durham colors}
+\end{table}
+
+\subsection{Secondary Palette}
+
+\begin{lstlisting}
+d_red   =[170.0/255.0,43.0/255.0,74.0/255.0]   # Red 201C
+d_pink  =[196.0/255.0,59.0/255.0,142.0/255.0]  # Pink 675C
+d_olive =[159.0/255.0,161.0/255.0,97.0/255.0]  # Olive Green 5835C
+\end{lstlisting}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{lcccc}
+\toprule
+Color & Variable & RGB (0-255) & PANTONE & Preview \\
+\midrule
+Red & \texttt{d\_red} & (170, 43, 74) & 201C & \cellcolor{d_red} \\
+Pink & \texttt{d\_pink} & (196, 59, 142) & 675C & \cellcolor{d_pink} \\
+Olive & \texttt{d\_olive} & (159, 161, 97) & 5835C & \cellcolor{d_olive} \\
+\bottomrule
+\end{tabular}
+\caption{Secondary Durham colors}
+\end{table}
+
+\subsection{Light Accent Colors}
+
+\begin{lstlisting}
+d_lightpurple=[216.0/255.0,172.0/255.0,244.0/255.0]  # 257C
+d_midblue    =[145./255,184.0/255.0,189.0/255.0]     # 5493C
+d_lightblue  =[196./255,229.0/255.0,250.0/255.0]     # 290C
+d_yellow     =[232.0/255.0,227.0/255.0,145.0/255.0]  # 459C
+\end{lstlisting}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{lcccc}
+\toprule
+Color & Variable & RGB (0-255) & PANTONE & Preview \\
+\midrule
+Light Purple & \texttt{d\_lightpurple} & (216, 172, 244) & 257C & \cellcolor{d_lightpurple} \\
+Mid Blue & \texttt{d\_midblue} & (145, 184, 189) & 5493C & \cellcolor{d_midblue} \\
+Light Blue & \texttt{d\_lightblue} & (196, 229, 250) & 290C & \cellcolor{d_lightblue} \\
+Yellow & \texttt{d\_yellow} & (232, 227, 145) & 459C & \cellcolor{d_yellow} \\
+\bottomrule
+\end{tabular}
+\caption{Light accent colors}
+\end{table}
+
+\subsection{Neutral Colors}
+
+\begin{lstlisting}
+d_grey     =[150./255,142./255,133./255]      # Warm Grey 8C
+d_black    =[35./255,31./255,32./255]         # Black C
+d_lightgrey=[207./255,218./255,209./255]      # Near White 5655C
+d_midgrey  =[110./255, 100./255, 100./255]
+\end{lstlisting}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{lcccc}
+\toprule
+Color & Variable & RGB (0-255) & PANTONE & Preview \\
+\midrule
+Grey & \texttt{d\_grey} & (150, 142, 133) & 8C & \cellcolor{d_grey} \\
+Black & \texttt{d\_black} & (35, 31, 32) & BlackC & \cellcolor{d_black} \\
+Light Grey & \texttt{d\_lightgrey} & (207, 218, 209) & 5655C & \cellcolor{d_lightgrey} \\
+\bottomrule
+\end{tabular}
+\caption{Neutral colors}
+\end{table}
+
+%==============================================================================
+\section{Code Structure}
+%==============================================================================
+
+\subsection{Color Lists}
+
+\begin{lstlisting}
+cols = [d_purple,d_blue,d_lightpurple,d_midblue,d_olive,
+        d_red,d_yellow,d_lightblue,d_grey,d_black,d_lightgrey,d_pink]
+
+colname = ['d_purple', 'd_blue', 'd_lightpurple', 'd_midblue', 'd_olive',
+           'd_red', 'd_yellow', 'd_lightblue', 'd_grey', 'd_black', 
+           'd_lightgrey', 'd_pink']
+\end{lstlisting}
+\textit{Lists for programmatic access to all colors and their names.}
+
+\subsection{Help Function}
+
+\begin{lstlisting}
+def help_dcols():
+    """ Show a plot demonstrating all the colours """
+    from pylab import figure,clf,subplots,show
+    from matplotlib.patches import Rectangle
+    fig, axes = subplots(4,3)
+    # ... creates visual palette display
+    fig.savefig('durhamcolors.png')
+    fig.savefig('durhamcolors.pdf')
+    show()
+\end{lstlisting}
+\textit{Generates a visual reference showing all colors with their names.}
+
+%==============================================================================
+\section{Usage Examples}
+%==============================================================================
+
+\subsection{Basic Plot}
+
+\begin{lstlisting}
+from durhamcolours import *
+import matplotlib.pyplot as plt
+
+plt.plot(x, y1, color=d_purple, label='Data 1')
+plt.plot(x, y2, color=d_blue, label='Data 2')
+plt.plot(x, y3, color=d_red, label='Data 3')
+plt.legend()
+plt.show()
+\end{lstlisting}
+
+\subsection{Cycling Through Colors}
+
+\begin{lstlisting}
+from durhamcolours import cols
+
+for i, dataset in enumerate(datasets):
+    plt.plot(x, dataset, color=cols[i % len(cols)])
+\end{lstlisting}
+
+\subsection{Spectroscopy Application}
+
+\begin{lstlisting}
+# Plot Rb D2 spectrum with theory and experiment
+plt.plot(detuning, experiment, 'o', color=d_blue, 
+         markersize=2, label='Experiment')
+plt.plot(detuning, theory, color=d_red, 
+         linewidth=1.5, label='Theory')
+plt.fill_between(detuning, 0, transmission, 
+                 color=d_lightblue, alpha=0.3)
+\end{lstlisting}
+
+%==============================================================================
+\section{Color Accessibility}
+%==============================================================================
+
+\subsection{Colorblind Considerations}
+
+The Durham palette includes colors that may be difficult to distinguish for colorblind viewers. Recommendations:
+\begin{itemize}
+\item Use \texttt{d\_blue} vs \texttt{d\_yellow} for maximum contrast
+\item Combine color with line style (solid, dashed, dotted)
+\item Add markers to distinguish data series
+\end{itemize}
+
+\subsection{Print Considerations}
+
+Colors are designed to work in both color and grayscale print. The palette includes sufficient luminance variation for grayscale reproduction.
+
+%==============================================================================
+\section{Summary}
+%==============================================================================
+
+The \texttt{durhamcolours.py} module provides:
+
+\begin{enumerate}
+\item 12 named color variables for direct use in plotting
+\item \texttt{cols} list for programmatic iteration
+\item \texttt{colname} list for labels and legends
+\item \texttt{help\_dcols()} function for visual reference
+\end{enumerate}
+
+Import methods:
+\begin{lstlisting}
+# Method 1: Import all colors
+from durhamcolours import *
+
+# Method 2: Import specific colors
+from durhamcolours import d_purple, d_blue, d_red
+
+# Method 3: Import module
+import durhamcolours as dc
+plt.plot(x, y, color=dc.d_purple)
+\end{lstlisting}
+
+The palette ensures consistent, professional styling across all ElecSus visualizations and publications.
+
+\end{document}

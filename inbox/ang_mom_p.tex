@@ -1,0 +1,236 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{physics}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{geometry}
+\usepackage{hyperref}
+\usepackage{booktabs}
+
+\geometry{margin=1in}
+
+\lstset{
+    language=Python,
+    basicstyle=\ttfamily\small,
+    keywordstyle=\color{blue},
+    commentstyle=\color{green!60!black},
+    stringstyle=\color{orange},
+    numbers=left,
+    numberstyle=\tiny\color{gray},
+    breaklines=true,
+    frame=single,
+    backgroundcolor=\color{gray!10}
+}
+
+\newtheorem{axiom}{Axiom}
+\newtheorem{definition}{Definition}
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}{Lemma}
+\newtheorem{corollary}{Corollary}
+
+\title{\textbf{ang\_mom\_p.py} \\ Angular Momentum Raising Operator \\ \large Matrix Representation of $J_+$}
+\author{ElecSus Library Documentation}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+This document provides mathematical foundations and implementation details for \texttt{ang\_mom\_p.py}, which constructs the matrix representation of the angular momentum raising (ladder) operator $J_+$. This operator is fundamental for building complete angular momentum algebras used in atomic structure calculations.
+\end{abstract}
+
+\tableofcontents
+\newpage
+
+%==============================================================================
+\section{Theoretical Foundation}
+%==============================================================================
+
+\subsection{Angular Momentum Algebra}
+
+\begin{axiom}[Angular Momentum Commutation Relations]
+The components of angular momentum satisfy the fundamental commutation relations:
+\begin{equation}
+[J_i, J_j] = i\hbar \epsilon_{ijk} J_k
+\end{equation}
+where $\epsilon_{ijk}$ is the Levi-Civita symbol.
+\end{axiom}
+
+\begin{definition}[Ladder Operators]
+The raising and lowering operators are defined as:
+\begin{equation}
+J_+ = J_x + iJ_y, \quad J_- = J_x - iJ_y
+\end{equation}
+These operators raise or lower the magnetic quantum number $m$ by one unit.
+\end{definition}
+
+\begin{theorem}[Action of $J_+$]
+The raising operator acts on angular momentum eigenstates as:
+\begin{equation}
+J_+ |j, m\rangle = \hbar\sqrt{j(j+1) - m(m+1)} |j, m+1\rangle
+\end{equation}
+\end{theorem}
+
+\begin{proof}
+Using $J_+ = J_x + iJ_y$ and the commutation relations:
+\begin{align}
+[J_z, J_+] &= \hbar J_+ \\
+J_z (J_+ |j,m\rangle) &= (J_+ J_z + \hbar J_+)|j,m\rangle = \hbar(m+1)(J_+|j,m\rangle)
+\end{align}
+The normalization follows from $\langle j,m|J_- J_+|j,m\rangle = \langle j,m|J^2 - J_z^2 - \hbar J_z|j,m\rangle$.
+\end{proof}
+
+\begin{corollary}[Matrix Elements]
+In the $|j, m\rangle$ basis (ordered from $m = j$ to $m = -j$):
+\begin{equation}
+\langle j, m' | J_+ | j, m \rangle = \hbar\sqrt{j(j+1) - m(m+1)} \delta_{m', m+1}
+\end{equation}
+This gives a matrix with non-zero elements only on the super-diagonal.
+\end{corollary}
+
+\subsection{Matrix Structure}
+
+\begin{definition}[Dimension of Representation]
+For angular momentum $j$, the dimension of the matrix representation is:
+\begin{equation}
+\text{dim} = 2j + 1
+\end{equation}
+corresponding to $m \in \{j, j-1, \ldots, -j+1, -j\}$.
+\end{definition}
+
+\begin{lemma}[Super-diagonal Form]
+The $J_+$ matrix has the structure:
+\begin{equation}
+J_+ = \begin{pmatrix}
+0 & c_1 & 0 & \cdots & 0 \\
+0 & 0 & c_2 & \cdots & 0 \\
+\vdots & & \ddots & \ddots & \vdots \\
+0 & 0 & \cdots & 0 & c_{2j} \\
+0 & 0 & \cdots & 0 & 0
+\end{pmatrix}
+\end{equation}
+where $c_k = \sqrt{j(j+1) - (j-k)(j-k+1)}$ (in units of $\hbar$).
+\end{lemma}
+
+%==============================================================================
+\section{Line-by-Line Code Analysis}
+%==============================================================================
+
+\subsection{Module Imports}
+
+\begin{lstlisting}
+from numpy import zeros,sqrt,arange
+\end{lstlisting}
+\textit{Import NumPy functions for array creation and mathematical operations.}
+
+\subsection{The jp Function}
+
+\begin{lstlisting}
+def jp(jj):
+    b = 0
+    dim = int(2*jj+1)
+    jp = zeros((dim,dim))
+\end{lstlisting}
+\begin{equation}
+\text{dim} = 2j + 1
+\end{equation}
+\textit{Initialize counter $b=0$ and create a zero matrix of dimension $(2j+1) \times (2j+1)$.}
+
+\vspace{0.5em}
+\begin{lstlisting}
+    z = arange(dim)
+    m = jj-z
+\end{lstlisting}
+\begin{equation}
+z = [0, 1, 2, \ldots, 2j], \quad m = [j, j-1, j-2, \ldots, -j]
+\end{equation}
+\textit{Create index array and corresponding magnetic quantum numbers. The convention orders states from highest to lowest $m$.}
+
+\vspace{0.5em}
+\begin{lstlisting}
+    while b<dim-1:
+        mm = m[b+1]
+        jp[b,b+1] = sqrt(jj*(jj+1)-mm*(mm+1)) 
+        b = b+1
+\end{lstlisting}
+\begin{equation}
+(J_+)_{b,b+1} = \sqrt{j(j+1) - m_{b+1}(m_{b+1}+1)}
+\end{equation}
+\textit{Loop fills the super-diagonal. For each row $b$, the element connects state $|j, m_{b+1}\rangle$ to $|j, m_{b+1}+1\rangle = |j, m_b\rangle$.}
+
+\vspace{0.5em}
+\begin{lstlisting}
+    return jp
+\end{lstlisting}
+\textit{Return the completed $J_+$ matrix (in units where $\hbar = 1$).}
+
+%==============================================================================
+\section{Numerical Examples}
+%==============================================================================
+
+\subsection{Spin-1/2 Case ($j = 1/2$)}
+
+For $j = 1/2$, dim $= 2$, states are $|+\rangle = |1/2, +1/2\rangle$ and $|-\rangle = |1/2, -1/2\rangle$:
+\begin{equation}
+J_+ = \begin{pmatrix} 0 & 1 \\ 0 & 0 \end{pmatrix}
+\end{equation}
+since $\sqrt{1/2 \cdot 3/2 - (-1/2)(1/2)} = \sqrt{3/4 + 1/4} = 1$.
+
+\subsection{Spin-1 Case ($j = 1$)}
+
+For $j = 1$, dim $= 3$, states ordered as $|1,1\rangle$, $|1,0\rangle$, $|1,-1\rangle$:
+\begin{equation}
+J_+ = \begin{pmatrix} 0 & \sqrt{2} & 0 \\ 0 & 0 & \sqrt{2} \\ 0 & 0 & 0 \end{pmatrix}
+\end{equation}
+
+\subsection{Nuclear Spin $I = 3/2$}
+
+For $I = 3/2$ (e.g., $^{87}$Rb nucleus), dim $= 4$:
+\begin{equation}
+I_+ = \begin{pmatrix} 
+0 & \sqrt{3} & 0 & 0 \\ 
+0 & 0 & 2 & 0 \\ 
+0 & 0 & 0 & \sqrt{3} \\ 
+0 & 0 & 0 & 0 
+\end{pmatrix}
+\end{equation}
+
+%==============================================================================
+\section{Relationship to Other Operators}
+%==============================================================================
+
+\subsection{Construction of $J_x$, $J_y$, $J_z$}
+
+The Cartesian components are constructed from ladder operators:
+\begin{align}
+J_x &= \frac{1}{2}(J_+ + J_-) = \frac{1}{2}(J_+ + J_+^\dagger) \\
+J_y &= \frac{1}{2i}(J_+ - J_-) = \frac{1}{2i}(J_+ - J_+^\dagger) \\
+J_z &= \frac{1}{2}(J_+ J_- - J_- J_+)
+\end{align}
+
+Note: $J_- = J_+^\dagger$ (transpose for real matrices).
+
+\subsection{Total Angular Momentum}
+
+\begin{equation}
+J^2 = J_x^2 + J_y^2 + J_z^2 = \frac{1}{2}(J_+ J_- + J_- J_+) + J_z^2
+\end{equation}
+
+%==============================================================================
+\section{Summary}
+%==============================================================================
+
+The \texttt{ang\_mom\_p.py} module implements:
+
+\begin{enumerate}
+\item Matrix representation of the angular momentum raising operator $J_+$
+\item Correct normalization following the convention $\hbar = 1$
+\item Super-diagonal structure with elements $\sqrt{j(j+1) - m(m+1)}$
+\item State ordering from $m = j$ (row 0) to $m = -j$ (row $2j$)
+\end{enumerate}
+
+This module is called by \texttt{ang\_mom.py} to construct the complete set of angular momentum matrices $\{J_x, J_y, J_z\}$ used throughout the ElecSus package.
+
+\end{document}

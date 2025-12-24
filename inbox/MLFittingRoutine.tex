@@ -1,0 +1,314 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{physics}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{geometry}
+\usepackage{hyperref}
+\usepackage{booktabs}
+
+\geometry{margin=1in}
+
+\lstset{
+    language=Python,
+    basicstyle=\ttfamily\small,
+    keywordstyle=\color{blue},
+    commentstyle=\color{green!60!black},
+    stringstyle=\color{orange},
+    numbers=left,
+    numberstyle=\tiny\color{gray},
+    breaklines=true,
+    frame=single,
+    backgroundcolor=\color{gray!10}
+}
+
+\newtheorem{axiom}{Axiom}
+\newtheorem{definition}{Definition}
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}{Lemma}
+\newtheorem{corollary}{Corollary}
+
+\title{\textbf{MLFittingRoutine.py} \\ Marquardt-Levenberg Fitting \\ \large Parameter Optimization for Atomic Spectra}
+\author{ElecSus Library Documentation}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+This document provides comprehensive documentation for \texttt{MLFittingRoutine.py}, which implements spectral fitting using the lmfit library. The module enables extraction of physical parameters (temperature, magnetic field, cell length, etc.) from experimental atomic spectra through nonlinear least-squares optimization.
+\end{abstract}
+
+\tableofcontents
+\newpage
+
+%==============================================================================
+\section{Theoretical Foundation}
+%==============================================================================
+
+\subsection{Nonlinear Least Squares}
+
+\begin{axiom}[Optimization Principle]
+The best-fit parameters minimize the sum of squared residuals:
+\begin{equation}
+\chi^2(\vec{p}) = \sum_{i=1}^{N} \left[ y_i - f(x_i; \vec{p}) \right]^2
+\end{equation}
+where $\vec{p}$ is the parameter vector and $f$ is the model function.
+\end{axiom}
+
+\begin{definition}[Levenberg-Marquardt Algorithm]
+An iterative method that interpolates between gradient descent and Gauss-Newton:
+\begin{equation}
+\vec{p}_{k+1} = \vec{p}_k - (J^T J + \lambda \, \text{diag}(J^T J))^{-1} J^T \vec{r}
+\end{equation}
+where $J$ is the Jacobian matrix, $\vec{r}$ is the residual vector, and $\lambda$ is the damping parameter.
+\end{definition}
+
+\begin{theorem}[Convergence Properties]
+The L-M algorithm converges to a local minimum. For well-posed problems with good initial guesses, convergence is typically quadratic near the minimum.
+\end{theorem}
+
+\subsection{Parameter Estimation}
+
+\begin{definition}[Covariance Matrix]
+The parameter covariance matrix at the minimum:
+\begin{equation}
+\text{Cov}(\vec{p}) \approx \sigma^2 (J^T J)^{-1}
+\end{equation}
+where $\sigma^2 = \chi^2/(N - M)$ is the reduced chi-squared.
+\end{definition}
+
+\begin{theorem}[Parameter Uncertainties]
+The standard error of parameter $p_i$ is:
+\begin{equation}
+\sigma_{p_i} = \sqrt{\text{Cov}(\vec{p})_{ii}}
+\end{equation}
+\end{theorem}
+
+%==============================================================================
+\section{Physical Model Parameters}
+%==============================================================================
+
+\subsection{Fitting Parameters}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{lll}
+\toprule
+Parameter & Symbol & Physical Meaning \\
+\midrule
+\texttt{T} & $T$ & Temperature (K) \\
+\texttt{lcell} & $L$ & Cell length (m) \\
+\texttt{Bfield} & $B$ & Magnetic field (G) \\
+\texttt{Btheta} & $\theta_B$ & Field polar angle (rad) \\
+\texttt{Bphi} & $\phi_B$ & Field azimuthal angle (rad) \\
+\texttt{GammaBuf} & $\Gamma_{buf}$ & Buffer gas broadening (MHz) \\
+\texttt{shift} & $\delta$ & Frequency offset (MHz) \\
+\texttt{DoppTemp} & $T_D$ & Doppler temperature (K) \\
+\texttt{E\_x, E\_y} & $E_x, E_y$ & Electric field components \\
+\texttt{E\_phase} & $\phi_E$ & Relative phase (rad) \\
+\texttt{rb85frac} & $f_{85}$ & $^{85}$Rb fraction (\%) \\
+\bottomrule
+\end{tabular}
+\caption{Physical parameters in the fitting model}
+\end{table}
+
+%==============================================================================
+\section{Line-by-Line Code Analysis}
+%==============================================================================
+
+\subsection{Module Imports}
+
+\begin{lstlisting}
+import matplotlib.pyplot as plt
+import numpy as np
+import lmfit as lm
+from spectra import get_spectra
+\end{lstlisting}
+\textit{Import plotting, numerical, fitting libraries, and the spectrum calculator.}
+
+\subsection{Fit Function Wrapper}
+
+\begin{lstlisting}
+def fit_function(x,E_x,E_y,E_phase,T,lcell,Bfield,Btheta,Bphi,
+                 GammaBuf,shift,DoppTemp=20,rb85frac=72.17,
+                 K40frac=0.01,K41frac=6.73,Elem='Rb',Dline='D2',
+                 Constrain=True,output='S0', verbose=False):
+\end{lstlisting}
+\textit{Wrapper function with explicit parameter arguments for lmfit compatibility.}
+
+\vspace{0.5em}
+\begin{lstlisting}
+    # Ex / Ey separated to allow for fitting polarisation
+    E_in = np.array([E_x,E_y*np.exp(1.j*E_phase),0.])
+\end{lstlisting}
+\begin{equation}
+\vec{E}_{in} = (E_x, E_y e^{i\phi_E}, 0)
+\end{equation}
+\textit{Construct complex electric field vector. Phase allows elliptical polarization.}
+
+\vspace{0.5em}
+\begin{lstlisting}
+    #reconstruct parameter dictionary from arguments
+    p_dict = {'Elem':Elem,'Dline':Dline,'T':T,'lcell':lcell,
+              'Bfield':Bfield,'Btheta':Btheta,'Bphi':Bphi,
+              'GammaBuf':GammaBuf,'shift':shift,'DoppTemp':DoppTemp,
+              'Constrain':Constrain,'rb85frac':rb85frac,
+              'K40frac':K40frac,'K41frac':K41frac}
+    
+    outputs = [output]
+    y_out = get_spectra(x,E_in,p_dict,outputs)[0].real
+    return y_out
+\end{lstlisting}
+\textit{Call the spectrum generator and return real-valued output for fitting.}
+
+\subsection{Main Fitting Function: ML\_fit}
+
+\begin{lstlisting}
+def ML_fit(data,E_in,p_dict,p_dict_bools,data_type='S0',
+           p_dict_bounds=None,method='leastsq',verbose=False):
+    """Main fitting method."""
+    
+    x = np.array(data[0])
+    y = np.array(data[1])
+\end{lstlisting}
+\textit{Extract x (detuning) and y (signal) from data.}
+
+\vspace{0.5em}
+\begin{lstlisting}
+    # Non-numeric arguments to pass to fitting function
+    kwargz = {'Elem':p_dict['Elem'],'Dline':p_dict['Dline']}
+    if 'Constrain' in list(p_dict.keys()): 
+        kwargz['Constrain'] = p_dict['Constrain']
+    else:
+        kwargz['Constrain'] = True
+    kwargz['output'] = data_type
+\end{lstlisting}
+\textit{Set up keyword arguments for non-fitted parameters.}
+
+\vspace{0.5em}
+\begin{lstlisting}
+    model = lm.Model(fit_function)
+    params = model.make_params(**p_dict)
+\end{lstlisting}
+\textit{Create lmfit Model object and initialize parameters.}
+
+\vspace{0.5em}
+\begin{lstlisting}
+    params['E_x'].value = E_in[0]
+    params['E_y'].value = E_in[1][0]
+    params['E_phase'].value = E_in[1][1]
+    params['E_phase'].min = 0
+    params['E_phase'].max = np.pi-1e-4
+\end{lstlisting}
+\textit{Set polarization parameters with bounds on phase.}
+
+\subsection{Parameter Control}
+
+\begin{lstlisting}
+    # Turn off all parameters varying by default
+    allkeys = params.valuesdict()
+    for key in allkeys:
+        params[key].vary = False
+    
+    # Turn on fitting parameters as specified in p_dict_bools
+    for key in p_dict_bools:
+        params[key].vary = p_dict_bools[key]
+        
+        if p_dict_bounds is not None:
+            if key in p_dict_bounds:
+                params[key].min = p_dict_bounds[key][0]
+                params[key].max = p_dict_bounds[key][1]
+\end{lstlisting}
+\textit{Selective parameter variation: only fit parameters marked True in \texttt{p\_dict\_bools}.}
+
+\subsection{Fitting Execution}
+
+\begin{lstlisting}
+    result = model.fit(y, x=x, params=params, method=method, **kwargz)
+    return result.best_values, result
+\end{lstlisting}
+\textit{Execute fit and return best-fit values plus full result object.}
+
+%==============================================================================
+\section{Available Fitting Methods}
+%==============================================================================
+
+\begin{table}[h]
+\centering
+\begin{tabular}{ll}
+\toprule
+Method String & Algorithm \\
+\midrule
+\texttt{'leastsq'} & Levenberg-Marquardt (default) \\
+\texttt{'least\_squares'} & Trust Region Reflective \\
+\texttt{'differential\_evolution'} & Global optimization \\
+\texttt{'nelder'} & Nelder-Mead simplex \\
+\texttt{'powell'} & Powell's method \\
+\texttt{'cobyla'} & COBYLA \\
+\texttt{'slsqp'} & Sequential Least Squares \\
+\bottomrule
+\end{tabular}
+\caption{Supported optimization algorithms}
+\end{table}
+
+%==============================================================================
+\section{Usage Example}
+%==============================================================================
+
+\begin{lstlisting}
+# Experimental data
+data = [detuning_array, transmission_array]
+
+# Initial parameters
+p_dict = {'Elem':'Rb', 'Dline':'D2', 'T':350, 'lcell':75e-3,
+          'Bfield':100, 'Btheta':0, 'Bphi':0, 'GammaBuf':0,
+          'shift':0, 'DoppTemp':350, 'rb85frac':72.17}
+
+# Which parameters to fit
+p_dict_bools = {'T':True, 'Bfield':True, 'shift':True}
+
+# Parameter bounds
+p_dict_bounds = {'T':(300, 500), 'Bfield':(0, 1000)}
+
+# Input polarization [E_x, (E_y_amplitude, phase)]
+E_in = [1, (0, 0)]
+
+# Run fit
+best_values, result = ML_fit(data, E_in, p_dict, p_dict_bools,
+                             p_dict_bounds=p_dict_bounds)
+
+print(result.fit_report())
+\end{lstlisting}
+
+%==============================================================================
+\section{Summary}
+%==============================================================================
+
+The \texttt{MLFittingRoutine.py} module provides:
+
+\begin{enumerate}
+\item \texttt{fit\_function}: lmfit-compatible wrapper for spectrum calculation
+\item \texttt{ML\_fit}: Main fitting interface with flexible parameter control
+\end{enumerate}
+
+Key features:
+\begin{itemize}
+\item Selective parameter fitting via Boolean dictionary
+\item Parameter bounds support
+\item Multiple optimization algorithms
+\item Returns full lmfit result object with uncertainties, correlations
+\item Supports all Stokes parameters as fit targets
+\end{itemize}
+
+The module enables precision determination of:
+\begin{itemize}
+\item Vapor temperature from Doppler width
+\item Magnetic field from Zeeman splitting
+\item Cell length from absorption depth
+\item Isotope ratios from line intensities
+\end{itemize}
+
+\end{document}
