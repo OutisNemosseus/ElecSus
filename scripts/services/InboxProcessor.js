@@ -198,6 +198,24 @@ ${content}
   }
 
   /**
+   * Clean LaTeX commands from text for use in MDX
+   * @param {string} text - Text with LaTeX commands
+   * @returns {string} Cleaned text
+   */
+  cleanLatexForMdx(text) {
+    return text
+      .replace(/\\textbf\{([^}]*)\}/g, '$1')  // Remove \textbf{}
+      .replace(/\\textit\{([^}]*)\}/g, '$1')  // Remove \textit{}
+      .replace(/\\emph\{([^}]*)\}/g, '$1')    // Remove \emph{}
+      .replace(/\\texttt\{([^}]*)\}/g, '$1')  // Remove \texttt{}
+      .replace(/\\[a-zA-Z]+\{([^}]*)\}/g, '$1') // Remove other commands
+      .replace(/\\\\/g, '')                    // Remove line breaks
+      .replace(/\\[a-zA-Z]+/g, '')             // Remove standalone commands
+      .replace(/[{}]/g, '')                    // Remove remaining braces
+      .trim();
+  }
+
+  /**
    * Process LaTeX file
    * @param {string} filePath - Path to .tex file
    * @returns {Promise<string>} MDX content
@@ -208,20 +226,21 @@ ${content}
     const title = filename.replace('.tex', '');
     const staticPath = this.copyToStatic(filePath);
 
-    // Extract document title if present
-    const titleMatch = content.match(/\\title\{([^}]+)\}/);
-    const docTitle = titleMatch ? titleMatch[1] : title;
+    // Extract document title if present - handle nested braces
+    const titleMatch = content.match(/\\title\{((?:[^{}]|\{[^{}]*\})*)\}/);
+    const rawTitle = titleMatch ? titleMatch[1] : title;
+    const docTitle = this.cleanLatexForMdx(rawTitle);
 
     // Extract author if present
     const authorMatch = content.match(/\\author\{([^}]+)\}/);
-    const author = authorMatch ? authorMatch[1] : '';
+    const author = authorMatch ? this.cleanLatexForMdx(authorMatch[1]) : '';
 
     // Extract abstract if present
     const abstractMatch = content.match(/\\begin\{abstract\}([\s\S]*?)\\end\{abstract\}/);
-    const abstract = abstractMatch ? abstractMatch[1].trim() : '';
+    const abstract = abstractMatch ? this.cleanLatexForMdx(abstractMatch[1]) : '';
 
     // Extract sections
-    const sections = [...content.matchAll(/\\section\{([^}]+)\}/g)].map(m => m[1]);
+    const sections = [...content.matchAll(/\\section\{([^}]+)\}/g)].map(m => this.cleanLatexForMdx(m[1]));
 
     const lineCount = content.split('\n').length;
 
