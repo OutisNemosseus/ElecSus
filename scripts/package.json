@@ -2,14 +2,14 @@
   "name": "program-docs-generator",
   "version": "2.0.0",
   "description": "SOLID-compliant documentation generator for academic programs",
-  "main": "src/index.js",
+  "main": "index.js",
   "bin": {
-    "generate-docs": "src/index.js"
+    "generate-docs": "index.js"
   },
   "scripts": {
-    "start": "node src/index.js",
-    "watch": "node src/index.js --watch",
-    "clean": "node src/index.js --clean",
+    "start": "node index.js",
+    "watch": "node index.js --watch",
+    "clean": "node index.js --clean",
     "inbox": "node watch-inbox.js",
     "inbox:watch": "node watch-inbox.js --watch",
     "inbox:process": "node watch-inbox.js --process",
