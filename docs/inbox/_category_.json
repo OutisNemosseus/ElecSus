@@ -1,0 +1,8 @@
+{
+  "label": "PDF & LaTeX Docs",
+  "position": 1,
+  "link": {
+    "type": "generated-index",
+    "description": "PDF documents and LaTeX source files for ElecSus library modules."
+  }
+}

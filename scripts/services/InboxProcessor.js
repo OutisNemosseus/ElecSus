@@ -111,7 +111,9 @@ class InboxProcessor {
    * @returns {string} Static path for linking
    */
   copyToStatic(filePath) {
-    const staticDir = this.config.staticDir || path.join(process.cwd(), 'docs', 'static', 'inbox');
+    // Docusaurus serves static files from 'static' folder at root
+    const projectRoot = path.join(process.cwd(), '..');
+    const staticDir = this.config.staticDir || path.join(projectRoot, 'static', 'inbox');
     if (!fs.existsSync(staticDir)) {
       fs.mkdirSync(staticDir, { recursive: true });
     }
@@ -120,7 +122,8 @@ class InboxProcessor {
     const destPath = path.join(staticDir, filename);
     fs.copyFileSync(filePath, destPath);
 
-    return `/static/inbox/${filename}`;
+    // In Docusaurus, static/inbox/file.pdf is served at /inbox/file.pdf
+    return `/inbox/${filename}`;
   }
 
   /**
