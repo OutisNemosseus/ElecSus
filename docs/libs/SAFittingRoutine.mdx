@@ -1,0 +1,155 @@
+---
+title: SAFittingRoutine.py - Simulated Annealing
+sidebar_label: SAFittingRoutine.py
+sidebar_position: 17
+---
+
+# SAFittingRoutine.py - Simulated Annealing Fitting
+
+<div style={{display: 'flex', gap: '12px', flexWrap: 'wrap', marginBottom: '24px'}}>
+  <a href="/libs/SAFittingRoutine.py" download="SAFittingRoutine.py"
+    style={{padding: '10px 20px', backgroundColor: '#10b981', color: 'white', borderRadius: '6px', textDecoration: 'none', fontWeight: 'bold'}}>
+    Download .py
+  </a>
+</div>
+
+<div style={{display: 'flex', gap: '24px', marginBottom: '24px', flexWrap: 'wrap'}}>
+  <div style={{padding: '12px 16px', backgroundColor: '#f3f4f6', borderRadius: '8px'}}>
+    <div style={{fontSize: '24px', fontWeight: 'bold', color: '#3776ab'}}>665</div>
+    <div style={{fontSize: '12px', color: '#6b7280'}}>Lines of Code</div>
+  </div>
+  <div style={{padding: '12px 16px', backgroundColor: '#f3f4f6', borderRadius: '8px'}}>
+    <div style={{fontSize: '24px', fontWeight: 'bold', color: '#3776ab'}}>3</div>
+    <div style={{fontSize: '12px', color: '#6b7280'}}>Functions</div>
+  </div>
+</div>
+
+## Description
+
+Simulated annealing fitting routine. Before simulated annealing starts, the parameter space is randomly sampled to find good starting conditions.
+
+The algorithm accepts both downhill and uphill moves, with the probability of accepting uphill moves decreasing as the "temperature" decreases.
+
+## Dependencies
+
+```python
+import numpy as np
+import matplotlib.pyplot as plt
+import psutil
+from multiprocessing import Pool
+import pickle
+import MLFittingRoutine as ML
+import lmfit as lm
+from spectra import get_spectra
+```
+
+## Functions
+
+### `chisq(yo, ye, err=None)`
+
+Evaluate chi-squared value.
+
+**Arguments:**
+- `yo` - Observed data
+- `ye` - Expected (theory) data
+- `err` - Optional error bars
+
+**Returns:**
+- Chi-squared value
+
+### `evaluate(args)`
+
+Evaluate chi-squared for a given parameter set.
+
+### `SA_fit(data, E_in, p_dict, p_dict_bools, p_dict_bounds=None, no_evals=None, data_type='S0', verbose=False)`
+
+Simulated annealing fitting method.
+
+**Arguments:**
+- `data` - [x, y] arrays of experimental data
+- `E_in` - Input electric field
+- `p_dict` - Parameter dictionary with initial values
+- `p_dict_bools` - Dict specifying which parameters to vary
+- `p_dict_bounds` - Dict with deviation range for random sampling
+- `no_evals` - Number of initial random evaluations (default: 2^(8+2n))
+- `data_type` - Output type to fit
+- `verbose` - Print debug info
+
+**Returns:**
+- `best_params` - Dictionary of best-fit parameter values
+- `final_result` - lmfit result object (or 1 if ML fit failed)
+
+## Algorithm Parameters
+
+```python
+T = 1500.          # Initial temperature
+minimum_T = 50.    # Stopping temperature
+cooling_rate = 7e-6  # Temperature decrease rate
+hot_iterations = 250  # Iterations before cooling starts
+uphill_escape_threshold = 300  # Max rejected uphill moves
+plateau_escape_threshold = 300  # Max plateau iterations
+```
+
+## Algorithm Steps
+
+1. **Initialisation**: Randomly sample `no_evals` points in parameter space
+2. **Find best starting point**: Select parameters with lowest chi-squared
+3. **Annealing loop**:
+   - Generate trial parameters (small random step from current)
+   - Calculate chi-squared for trial
+   - If trial is better (lower χ²): accept
+   - If trial is worse: accept with probability exp(-Δχ²/kT)
+   - Cool the system: T → T/(1 + cooling_rate × T)
+4. **Exit conditions**:
+   - Temperature below threshold
+   - No improvement for 300 iterations
+   - Plateau detected (χ² unchanging)
+5. **Final polish**: Run ML fit from best SA parameters
+
+## Usage Example
+
+```python
+import numpy as np
+from SAFittingRoutine import SA_fit
+from spectra import get_spectra
+
+# Generate test data
+x = np.linspace(-10000, 10000, 200)
+E_in = np.array([0.7, 0.7, 0])
+p_dict_true = {'Elem': 'Rb', 'Dline': 'D2', 'T': 80,
+               'lcell': 2e-3, 'Bfield': 600}
+
+[y] = get_spectra(x, E_in, p_dict_true, outputs=['S1'])
+y_noisy = y.real + np.random.randn(len(x)) * 0.01
+data = [x, y_noisy]
+
+# Initial guess (deliberately wrong)
+E_in_angle = [0.7, [0.7, 0.0]]
+p_dict = {'Elem': 'Rb', 'Dline': 'D2', 'T': 60,
+          'lcell': 2e-3, 'Bfield': 400}
+
+p_dict_bools = {'T': True, 'Bfield': True}
+p_dict_bounds = {'T': 20, 'Bfield': 200}
+
+# Run simulated annealing
+best_params, result = SA_fit(data, E_in_angle, p_dict, p_dict_bools,
+                              p_dict_bounds, no_evals=4, data_type='S1')
+
+if result != 1:
+    print(result.fit_report())
+else:
+    print("Best parameters:", best_params)
+```
+
+## When to Use SA vs ML vs RR
+
+| Method | Best For |
+|--------|----------|
+| **ML** | Simple problems, good initial guess |
+| **RR** | Moderate complexity, unsure of initial guess |
+| **SA** | Complex chi-squared landscapes, many local minima |
+| **Differential Evolution** | Generally best for complex problems (recommended) |
+
+---
+
+[Back to Library Reference](./)

@@ -1,0 +1,127 @@
+---
+title: durhamcolours.py - Durham Colour Palette
+sidebar_label: durhamcolours.py
+sidebar_position: 19
+---
+
+# durhamcolours.py - Durham University Colour Palette
+
+<div style={{display: 'flex', gap: '12px', flexWrap: 'wrap', marginBottom: '24px'}}>
+  <a href="/libs/durhamcolours.py" download="durhamcolours.py"
+    style={{padding: '10px 20px', backgroundColor: '#10b981', color: 'white', borderRadius: '6px', textDecoration: 'none', fontWeight: 'bold'}}>
+    Download .py
+  </a>
+</div>
+
+<div style={{display: 'flex', gap: '24px', marginBottom: '24px', flexWrap: 'wrap'}}>
+  <div style={{padding: '12px 16px', backgroundColor: '#f3f4f6', borderRadius: '8px'}}>
+    <div style={{fontSize: '24px', fontWeight: 'bold', color: '#3776ab'}}>93</div>
+    <div style={{fontSize: '12px', color: '#6b7280'}}>Lines of Code</div>
+  </div>
+  <div style={{padding: '12px 16px', backgroundColor: '#f3f4f6', borderRadius: '8px'}}>
+    <div style={{fontSize: '24px', fontWeight: 'bold', color: '#3776ab'}}>12</div>
+    <div style={{fontSize: '12px', color: '#6b7280'}}>Colours</div>
+  </div>
+</div>
+
+## Description
+
+Durham University colour palette for consistent plotting. Provides RGB values for the official Durham colour scheme.
+
+## Dependencies
+
+```python
+# Optional - only needed for help_dcols()
+from pylab import figure, clf, subplots, show
+from matplotlib.patches import Rectangle
+```
+
+## Available Colours
+
+<div style={{display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '8px', marginBottom: '24px'}}>
+  <div style={{backgroundColor: 'rgb(126, 49, 123)', color: 'white', padding: '8px', borderRadius: '4px', textAlign: 'center'}}>d_purple</div>
+  <div style={{backgroundColor: 'rgb(216, 172, 244)', color: 'black', padding: '8px', borderRadius: '4px', textAlign: 'center'}}>d_lightpurple</div>
+  <div style={{backgroundColor: 'rgb(0, 99, 136)', color: 'white', padding: '8px', borderRadius: '4px', textAlign: 'center'}}>d_blue</div>
+  <div style={{backgroundColor: 'rgb(145, 184, 189)', color: 'black', padding: '8px', borderRadius: '4px', textAlign: 'center'}}>d_midblue</div>
+  <div style={{backgroundColor: 'rgb(196, 229, 250)', color: 'black', padding: '8px', borderRadius: '4px', textAlign: 'center'}}>d_lightblue</div>
+  <div style={{backgroundColor: 'rgb(170, 43, 74)', color: 'white', padding: '8px', borderRadius: '4px', textAlign: 'center'}}>d_red</div>
+  <div style={{backgroundColor: 'rgb(196, 59, 142)', color: 'white', padding: '8px', borderRadius: '4px', textAlign: 'center'}}>d_pink</div>
+  <div style={{backgroundColor: 'rgb(159, 161, 97)', color: 'white', padding: '8px', borderRadius: '4px', textAlign: 'center'}}>d_olive</div>
+  <div style={{backgroundColor: 'rgb(232, 227, 145)', color: 'black', padding: '8px', borderRadius: '4px', textAlign: 'center'}}>d_yellow</div>
+  <div style={{backgroundColor: 'rgb(35, 31, 32)', color: 'white', padding: '8px', borderRadius: '4px', textAlign: 'center'}}>d_black</div>
+  <div style={{backgroundColor: 'rgb(150, 142, 133)', color: 'white', padding: '8px', borderRadius: '4px', textAlign: 'center'}}>d_grey</div>
+  <div style={{backgroundColor: 'rgb(207, 218, 209)', color: 'black', padding: '8px', borderRadius: '4px', textAlign: 'center'}}>d_lightgrey</div>
+</div>
+
+## Colour Definitions
+
+| Name | RGB Values | Pantone Code |
+|------|------------|--------------|
+| `d_purple` | [126, 49, 123] / 255 | 255C |
+| `d_lightpurple` | [216, 172, 244] / 255 | 257C |
+| `d_blue` | [0, 99, 136] / 255 | 634C |
+| `d_midblue` | [145, 184, 189] / 255 | 5493C |
+| `d_lightblue` | [196, 229, 250] / 255 | 290C |
+| `d_red` | [170, 43, 74] / 255 | 201C |
+| `d_pink` | [196, 59, 142] / 255 | 675C |
+| `d_olive` | [159, 161, 97] / 255 | 5835C |
+| `d_yellow` | [232, 227, 145] / 255 | 459C |
+| `d_black` | [35, 31, 32] / 255 | BlackC |
+| `d_grey` | [150, 142, 133] / 255 | 8C |
+| `d_lightgrey` | [207, 218, 209] / 255 | 5655C |
+
+## Usage
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+from durhamcolours import *
+
+x = np.linspace(0, 10, 100)
+
+plt.figure(figsize=(10, 6))
+plt.plot(x, np.sin(x), color=d_purple, lw=2, label='sin(x)')
+plt.plot(x, np.cos(x), color=d_blue, lw=2, label='cos(x)')
+plt.plot(x, np.sin(x)**2, color=d_red, lw=2, label='sin²(x)')
+plt.fill_between(x, 0, np.sin(x), color=d_lightpurple, alpha=0.3)
+plt.legend()
+plt.show()
+```
+
+## Functions
+
+### `help_dcols()`
+
+Display a plot showing all available colours with their names.
+
+```python
+from durhamcolours import help_dcols
+help_dcols()
+```
+
+Saves `durhamcolors.png` and `durhamcolors.pdf` to the current directory.
+
+## Source Code
+
+```python showLineNumbers
+d_purple = [126.0/255.0, 49.0/255.0, 123.0/255.0]
+d_lightpurple = [216.0/255.0, 172.0/255.0, 244.0/255.0]
+d_midblue = [145./255, 184.0/255.0, 189.0/255.0]
+d_olive = [159.0/255.0, 161.0/255.0, 97.0/255.0]
+d_blue = [0, 99.0/255.0, 136.0/255.0]
+d_red = [170.0/255.0, 43.0/255.0, 74.0/255.0]
+d_yellow = [232.0/255.0, 227.0/255.0, 145.0/255.0]
+d_lightblue = [196./255, 229.0/255.0, 250.0/255.0]
+d_pink = [196.0/255.0, 59.0/255.0, 142.0/255.0]
+d_grey = [150./255, 142./255, 133./255]
+d_black = [35./255, 31./255, 32./255]
+d_lightgrey = [207./255, 218./255, 209./255]
+d_midgrey = [110./255, 100./255, 100./255]
+
+cols = [d_purple, d_blue, d_lightpurple, d_midblue, d_olive,
+        d_red, d_yellow, d_lightblue, d_grey, d_black, d_lightgrey, d_pink]
+```
+
+---
+
+[Back to Library Reference](./)

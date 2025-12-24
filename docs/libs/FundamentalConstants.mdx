@@ -1,0 +1,102 @@
+---
+title: FundamentalConstants.py - Physical Constants
+sidebar_label: FundamentalConstants.py
+sidebar_position: 4
+---
+
+# FundamentalConstants.py - Physical Constants Module
+
+<div style={{display: 'flex', gap: '12px', flexWrap: 'wrap', marginBottom: '24px'}}>
+  <a href="/libs/FundamentalConstants.py" download="FundamentalConstants.py"
+    style={{padding: '10px 20px', backgroundColor: '#10b981', color: 'white', borderRadius: '6px', textDecoration: 'none', fontWeight: 'bold'}}>
+    Download .py
+  </a>
+</div>
+
+<div style={{display: 'flex', gap: '24px', marginBottom: '24px', flexWrap: 'wrap'}}>
+  <div style={{padding: '12px 16px', backgroundColor: '#f3f4f6', borderRadius: '8px'}}>
+    <div style={{fontSize: '24px', fontWeight: 'bold', color: '#3776ab'}}>37</div>
+    <div style={{fontSize: '12px', color: '#6b7280'}}>Lines of Code</div>
+  </div>
+  <div style={{padding: '12px 16px', backgroundColor: '#f3f4f6', borderRadius: '8px'}}>
+    <div style={{fontSize: '24px', fontWeight: 'bold', color: '#3776ab'}}>7</div>
+    <div style={{fontSize: '12px', color: '#6b7280'}}>Constants</div>
+  </div>
+</div>
+
+## Description
+
+Loads fundamental constants from scipy. Called by `AtomConstants.py` and `EigenSystem.py`.
+
+## Dependencies
+
+```python
+from numpy import pi, sqrt
+from scipy.constants import physical_constants, epsilon_0, hbar, c, e, h
+```
+
+## Constants
+
+| Constant | Symbol | Description | Source |
+|----------|--------|-------------|--------|
+| `S` | S = 0.5 | Electron spin | Fixed |
+| `gs` | g_s | Electron g-factor | CODATA |
+| `muB` | μ_B | Bohr magneton (J/T) | CODATA |
+| `kB` | k_B | Boltzmann constant (J/K) | CODATA |
+| `amu` | u | Atomic mass unit (kg) | CODATA |
+| `e0` | ε_0 | Permittivity of free space (F/m) | SciPy |
+| `a0` | a_0 | Bohr radius (m) | CODATA |
+
+## Source Code
+
+```python showLineNumbers
+# Copyright 2014 M. A. Zentile, J. Keaveney, L. Weller, D. Whiting,
+# C. S. Adams and I. G. Hughes.
+# Licensed under the Apache License, Version 2.0
+
+"""
+Loads fundamental constants from scipy
+
+Called by AtomConstants.py and EigenSystem.py
+
+Last updated 2018-02-19 JK
+"""
+from __future__ import (division, print_function, absolute_import)
+
+from numpy import pi, sqrt
+from scipy.constants import physical_constants, epsilon_0, hbar, c, e, h
+
+S = 0.5  # Electron spin
+gs = -physical_constants['electron g factor'][0]
+muB = physical_constants['Bohr magneton'][0]
+kB = physical_constants['Boltzmann constant'][0]
+amu = physical_constants['atomic mass constant'][0]  # Atomic mass unit in kg
+e0 = epsilon_0  # Permittivity of free space
+a0 = physical_constants['Bohr radius'][0]
+```
+
+## Usage
+
+```python
+from FundamentalConstants import kB, muB, amu
+
+# Calculate thermal energy at room temperature
+T = 300  # Kelvin
+E_thermal = kB * T
+print(f"Thermal energy: {E_thermal * 1e3:.4f} meV")
+
+# Calculate Zeeman splitting
+B = 100e-4  # 100 Gauss in Tesla
+E_zeeman = muB * B
+print(f"Zeeman energy: {E_zeeman / (hbar * 2 * pi * 1e6):.2f} MHz")
+```
+
+## Notes
+
+- All constants are obtained from SciPy's `physical_constants` dictionary, which uses CODATA recommended values
+- The electron g-factor `gs` is stored with positive sign (the physical_constants entry is negative)
+- Units follow SI conventions
+
+---
+
+[Back to Library Reference](./)

@@ -1,0 +1,192 @@
+---
+title: sz_lsi.py - Z-Projection Matrices
+sidebar_label: sz_lsi.py
+sidebar_position: 12
+---
+
+# sz_lsi.py - Z-Projection Matrices
+
+<div style={{display: 'flex', gap: '12px', flexWrap: 'wrap', marginBottom: '24px'}}>
+  <a href="/libs/sz_lsi.py" download="sz_lsi.py"
+    style={{padding: '10px 20px', backgroundColor: '#10b981', color: 'white', borderRadius: '6px', textDecoration: 'none', fontWeight: 'bold'}}>
+    Download .py
+  </a>
+</div>
+
+<div style={{display: 'flex', gap: '24px', marginBottom: '24px', flexWrap: 'wrap'}}>
+  <div style={{padding: '12px 16px', backgroundColor: '#f3f4f6', borderRadius: '8px'}}>
+    <div style={{fontSize: '24px', fontWeight: 'bold', color: '#3776ab'}}>78</div>
+    <div style={{fontSize: '12px', color: '#6b7280'}}>Lines of Code</div>
+  </div>
+  <div style={{padding: '12px 16px', backgroundColor: '#f3f4f6', borderRadius: '8px'}}>
+    <div style={{fontSize: '24px', fontWeight: 'bold', color: '#3776ab'}}>4</div>
+    <div style={{fontSize: '12px', color: '#6b7280'}}>Functions</div>
+  </div>
+</div>
+
+## Description
+
+Functions to calculate the z-projection matrices. Calculates the full size matrices for the projection on the quantisation axis for:
+- Electron spin (S_z)
+- Orbital angular momentum (L_z)
+- Nuclear spin (I_z)
+- Total angular momentum (F_z)
+
+Essentially takes results from `jz` and puts them in the full Hilbert space using Kronecker products.
+
+Called by `EigenSystem.py`.
+
+## Dependencies
+
+```python
+from numpy import identity
+from scipy.linalg import kron
+from ang_mom import jz
+```
+
+## Functions
+
+### `sz(L, S, I)`
+
+Calculate electron spin z-projection matrix in the full |L,S,I⟩ basis.
+
+**Arguments:**
+- `L` - Orbital angular momentum quantum number
+- `S` - Electron spin (typically 0.5)
+- `I` - Nuclear spin
+
+**Returns:**
+- S_z matrix in full basis, dimension (2L+1)(2S+1)(2I+1) × (2L+1)(2S+1)(2I+1)
+
+**Formula:**
+```
+S_z^full = L_identity ⊗ S_z ⊗ I_identity
+```
+
+### `lz(L, S, I)`
+
+Calculate orbital angular momentum z-projection matrix in the full basis.
+
+**Arguments:**
+- `L` - Orbital angular momentum quantum number
+- `S` - Electron spin
+- `I` - Nuclear spin
+
+**Returns:**
+- L_z matrix in full basis
+
+**Formula:**
+```
+L_z^full = L_z ⊗ S_identity ⊗ I_identity
+```
+
+### `Iz(L, S, I)`
+
+Calculate nuclear spin z-projection matrix in the full basis.
+
+**Arguments:**
+- `L` - Orbital angular momentum quantum number
+- `S` - Electron spin
+- `I` - Nuclear spin
+
+**Returns:**
+- I_z matrix in full basis
+
+**Formula:**
+```
+I_z^full = L_identity ⊗ S_identity ⊗ I_z
+```
+
+### `fz(L, S, I)`
+
+Calculate total angular momentum z-projection matrix F_z = J_z + I_z.
+
+**Arguments:**
+- `L` - Orbital angular momentum quantum number
+- `S` - Electron spin
+- `I` - Nuclear spin
+
+**Returns:**
+- F_z matrix in full basis
+
+**Formula:**
+```
+F_z = J_z ⊗ I_identity + J_identity ⊗ I_z
+```
+where J = L + S.
+
+## Source Code
+
+```python showLineNumbers
+from numpy import identity
+from scipy.linalg import kron
+from ang_mom import jz
+
+def sz(L, S, I):
+    Sz = jz(S)
+    gL = int(2*L + 1)
+    Li = identity(gL)
+    gI = int(2*I + 1)
+    Ii = identity(gI)
+    sz = kron(kron(Li, Sz), Ii)
+    return sz
+
+def lz(L, S, I):
+    gS = int(2*S + 1)
+    Si = identity(gS)
+    Lz = jz(L)
+    gI = int(2*I + 1)
+    Ii = identity(gI)
+    lz = kron(kron(Lz, Si), Ii)
+    return lz
+
+def Iz(L, S, I):
+    gS = int(2*S + 1)
+    gL = int(2*L + 1)
+    Si = identity(gS)
+    Li = identity(gL)
+    Iz_num = jz(I)
+    Iz = kron(kron(Li, Si), Iz_num)
+    return Iz
+
+def fz(L, S, I):
+    # ... combines J_z and I_z
+    pass
+```
+
+## Usage Example
+
+```python
+import numpy as np
+from sz_lsi import sz, lz, Iz, fz
+
+# Rb-87 ground state: L=0, S=1/2, I=3/2
+L, S, I = 0, 0.5, 1.5
+
+# Get z-projection matrices
+Sz_matrix = sz(L, S, I)
+Iz_matrix = Iz(L, S, I)
+
+print(f"Matrix dimension: {Sz_matrix.shape[0]} x {Sz_matrix.shape[0]}")
+# Output: Matrix dimension: 8 x 8
+# (2*0+1) * (2*0.5+1) * (2*1.5+1) = 1 * 2 * 4 = 8
+
+# Eigenvalues of S_z (should be ±1/2, each 4-fold degenerate)
+print("S_z eigenvalues:", np.linalg.eigvalsh(Sz_matrix))
+```
+
+## Matrix Dimensions
+
+For alkali atoms with L=0 (ground state) or L=1 (excited state):
+
+| Atom | L | S | I | Dim (ground) | Dim (excited) |
+|------|---|---|---|--------------|---------------|
+| Rb-85 | 0,1 | 1/2 | 5/2 | 12 | 36 |
+| Rb-87 | 0,1 | 1/2 | 3/2 | 8 | 24 |
+| Cs-133 | 0,1 | 1/2 | 7/2 | 16 | 48 |
+| K-39 | 0,1 | 1/2 | 3/2 | 8 | 24 |
+| Na-23 | 0,1 | 1/2 | 3/2 | 8 | 24 |
+
+---
+
+[Back to Library Reference](./)

@@ -1,0 +1,180 @@
+---
+title: preamble.py - GUI Variables
+sidebar_label: preamble.py
+sidebar_position: 20
+---
+
+# preamble.py - GUI Variables and Configuration
+
+<div style={{display: 'flex', gap: '12px', flexWrap: 'wrap', marginBottom: '24px'}}>
+  <a href="/libs/preamble.py" download="preamble.py"
+    style={{padding: '10px 20px', backgroundColor: '#10b981', color: 'white', borderRadius: '6px', textDecoration: 'none', fontWeight: 'bold'}}>
+    Download .py
+  </a>
+</div>
+
+<div style={{display: 'flex', gap: '24px', marginBottom: '24px', flexWrap: 'wrap'}}>
+  <div style={{padding: '12px 16px', backgroundColor: '#f3f4f6', borderRadius: '8px'}}>
+    <div style={{fontSize: '24px', fontWeight: 'bold', color: '#3776ab'}}>115</div>
+    <div style={{fontSize: '12px', color: '#6b7280'}}>Lines of Code</div>
+  </div>
+</div>
+
+## Description
+
+Variables used by the GUI. Contains formatting parameters, default values, parameter lists, and tooltip strings.
+
+## GUI Layout Variables
+
+```python
+BtnSize = 30  # Button vertical size in pixels
+```
+
+## Output Type Definitions
+
+```python
+OutputTypes = [
+    'Transmission (S0)', 'S1', 'S2', 'S3',
+    'Ix', 'Iy', 'I+45', 'I-45',
+    'Ircp', 'Ilcp',
+    'Alpha Plus', 'Alpha Minus', 'Alpha Z'
+]
+
+OutputPlotTypes = [
+    'Transmission (S0)', 'S1', 'S2', 'S3',
+    'Ix, Iy', 'I+45 / I-45', 'Ircp / Ilcp',
+    'Alpha Plus/Minus/Z'
+]
+```
+
+## Parameter Lists
+
+### Fixed Parameters
+
+```python
+fixed_parameterlist = ['Element', 'D-line', 'Constrain Dopp./Density Temps']
+element_list = ['Na', 'K', 'Rb', 'Cs']
+D_line_list = ['D1', 'D2']
+```
+
+### Polarisation Parameters
+
+```python
+polarisation_options = ['Linear', 'LCP', 'RCP', 'Elliptical']
+polarisation_controls = ['Theta-0', 'Ex', 'Ey', 'Phase [deg]']
+```
+
+### Magnetic Field Parameters
+
+```python
+magnet_parameterlist = ['Bfield', 'Btheta', 'Bphi']
+magnetunits_parameterlist = [' [G]', ' [deg]', ' [deg]']
+defaultvals_magnet_parameterlist = [0, 0, 0]
+defaultvals_magnet_increments = [1, 0.5, 0.5]
+```
+
+### Main Parameters
+
+```python
+main_parameterlist = [
+    'Temperature', 'Cell length', 'Shift',
+    'Additional-Broadening', 'Doppler-Temperature',
+    'Rb-85', 'K40', 'K41'
+]
+mainunits_parameterlist = [
+    ' [C]', ' [mm]', ' [MHz]', ' [MHz]',
+    ' [C]', ' [%]', ' [%]', ' [%]'
+]
+defaultvals_main_parameterlist = [20, 75, 0, 0, 20, 72.17, 0.01, 6.73]
+```
+
+## Parameter Bounds
+
+```python
+# Minimum values
+main_paramlist_mindefaults = [0, 0.001, -4000, 0, -273.15, 0, 0, 0]
+
+# Maximum values
+main_paramlist_maxdefaults = [1000, 100, 4000, 1000, 1000, 100, 100, 100]
+
+magnet_paramlist_mindefaults = [0, 0, 0]
+magnet_paramlist_maxdefaults = [20000, 360, 360]
+
+detuning_defaults = [-20, 20, 2500]  # [min, max, npoints]
+```
+
+## Tooltips
+
+The module contains extensive tooltip text for the GUI:
+
+### Magnetic Field Tooltips
+
+```python
+magnet_parameter_tooltips = [
+    'Applied magnetic field in Gauss...',
+    'Angle magnetic field axis makes with the z-axis...',
+    'Angle magnetic field axis makes with the x-axis'
+]
+```
+
+### Polarisation Tooltips
+
+```python
+polarisation_tooltips = [
+    'Linearly polarised light',
+    'Left-hand circularly polarised light',
+    'Right-hand circularly polarised light',
+    'Elliptically polarised light...'
+]
+```
+
+### Main Parameter Tooltips
+
+```python
+main_parameter_tooltips = [
+    'Vapour Temperature in degrees Celsius...',
+    'Cell length in mm...',
+    'Shift the global line-centre...',
+    'Additional homogeneous broadening...',
+    'Doppler Temperature...',
+    'Percentage of Rubidium-85 isotope...',
+    'Percentage of Potassium-40 isotope...',
+    'Percentage of Potassium-41 isotope...'
+]
+```
+
+### Keyboard Shortcuts
+
+```python
+parameter_adjust_tooltip = '''
+Shortcuts for faster adjustment of parameters:
+Shift + Arrow/MouseWheel = Adjust by 2x increment
+Ctrl + Arrow/MouseWheel = Adjust by 10x increment
+Alt + Arrow/MouseWheel = Adjust by 100x increment
+Escape = Set back to default value
+'''
+```
+
+## Usage
+
+This module is primarily used internally by the ElecSus GUI. For programmatic access:
+
+```python
+from preamble import (
+    element_list,
+    D_line_list,
+    defaultvals_main_parameterlist,
+    OutputTypes
+)
+
+# Get available elements
+print(f"Available elements: {element_list}")
+
+# Get default temperature
+temp_idx = main_parameterlist.index('Temperature')
+print(f"Default temperature: {defaultvals_main_parameterlist[temp_idx]} °C")
+```
+
+---
+
+[Back to Library Reference](./)

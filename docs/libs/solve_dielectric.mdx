@@ -1,0 +1,151 @@
+---
+title: solve_dielectric.py - Dielectric Tensor Solver
+sidebar_label: solve_dielectric.py
+sidebar_position: 6
+---
+
+# solve_dielectric.py - Dielectric Tensor Solver
+
+<div style={{display: 'flex', gap: '12px', flexWrap: 'wrap', marginBottom: '24px'}}>
+  <a href="/libs/solve_dielectric.py" download="solve_dielectric.py"
+    style={{padding: '10px 20px', backgroundColor: '#10b981', color: 'white', borderRadius: '6px', textDecoration: 'none', fontWeight: 'bold'}}>
+    Download .py
+  </a>
+</div>
+
+<div style={{display: 'flex', gap: '24px', marginBottom: '24px', flexWrap: 'wrap'}}>
+  <div style={{padding: '12px 16px', backgroundColor: '#f3f4f6', borderRadius: '8px'}}>
+    <div style={{fontSize: '24px', fontWeight: 'bold', color: '#3776ab'}}>463</div>
+    <div style={{fontSize: '12px', color: '#6b7280'}}>Lines of Code</div>
+  </div>
+  <div style={{padding: '12px 16px', backgroundColor: '#f3f4f6', borderRadius: '8px'}}>
+    <div style={{fontSize: '24px', fontWeight: 'bold', color: '#3776ab'}}>6</div>
+    <div style={{fontSize: '12px', color: '#6b7280'}}>Functions</div>
+  </div>
+</div>
+
+## Description
+
+Solve the dielectric tensor for the roots of the complex refractive index by setting determinant to zero.
+
+Uses analytic solutions for the 'easy' geometries:
+- **Faraday geometry**: B-field aligned with wavevector
+- **Voigt geometry**: B-field orthogonal to k-vector
+
+Uses SymPy to calculate solutions for all other non-trivial geometries.
+
+## Dependencies
+
+```python
+from sympy import Symbol, cos, sin, pi, simplify, eye, powsimp, powdenest, lambdify, solve, solveset
+from sympy.matrices import det, Matrix
+import numpy as np
+import scipy.linalg as la
+from scipy.linalg import qr
+import scipy
+from FundamentalConstants import e0
+```
+
+## Functions
+
+### `solve_diel(chiL, chiR, chiZ, THETA, Bfield, verbose=False, force_numeric=False)`
+
+Solves the wave equation to find the two propagating normal modes of the system.
+
+**Arguments:**
+- `chiL` - Complex susceptibility for left-circular polarisation (array)
+- `chiR` - Complex susceptibility for right-circular polarisation (array)
+- `chiZ` - Complex susceptibility for pi polarisation (array)
+- `THETA` - Magnetic field angle in radians (float)
+- `Bfield` - Magnitude of applied magnetic field in Gauss (float)
+- `verbose` - Output timing reports (bool)
+- `force_numeric` - Force numeric approach even for analytic cases (bool)
+
+**Returns:**
+- `RotMat` - Rotation matrix to transform coordinate system, shape (3, 3, N)
+- `n1` - First solution for refractive index, shape (N,)
+- `n2` - Second solution for refractive index, shape (N,)
+
+### `null(A, tol=1e-6)`
+
+Find the null eigenvector x of matrix A, such that Ax = 0.
+
+**Arguments:**
+- `A` - Input matrix
+- `tol` - Tolerance for zero eigenvalue
+
+**Returns:**
+- Null eigenvector or 0 if not found
+
+### `nullOld(A, eps=1e-14)`
+
+Alternative null space finder using SVD decomposition.
+
+## Physics
+
+### Dielectric Tensor
+
+The general form of the dielectric tensor in the presence of a magnetic field is:
+
+```
+ε = | εx    εxy   εxz |
+    | -εxy  εx    εyz |
+    | εzx   εzy   εz  |
+```
+
+where the elements depend on the susceptibilities:
+- εx = 1 + (χ+ + χ-)/2
+- εxy = i(χ- - χ+)/2
+- εz = 1 + χz
+
+### Faraday Geometry (θ = 0)
+
+Analytic solutions for B ∥ k:
+```python
+n1 = sqrt(εx + i·εxy)  # Left circular
+n2 = sqrt(εx - i·εxy)  # Right circular
+```
+
+### Voigt Geometry (θ = π/2)
+
+Analytic solutions for B ⊥ k:
+```python
+n1 = sqrt(εx + εxy²/εx)  # Extraordinary
+n2 = sqrt(εz)            # Ordinary
+```
+
+### General Geometry
+
+For arbitrary angles, the wave equation determinant is solved symbolically using SymPy.
+
+## Usage Example
+
+```python
+import numpy as np
+from solve_dielectric import solve_diel
+from spectra import calc_chi
+
+# Calculate susceptibilities
+p_dict = {'Elem': 'Rb', 'Dline': 'D2', 'T': 80, 'Bfield': 700}
+detuning = np.linspace(-3500, 3500, 100)
+chiL, chiR, chiZ = calc_chi(detuning, p_dict)
+
+# Solve for Faraday geometry (θ = 0)
+RotMat, n1, n2 = solve_diel(chiL, chiR, chiZ, 0, 700)
+
+# Solve for Voigt geometry (θ = π/2)
+RotMat, n1, n2 = solve_diel(chiL, chiR, chiZ, np.pi/2, 700)
+
+# Solve for arbitrary angle (θ = 45°)
+RotMat, n1, n2 = solve_diel(chiL, chiR, chiZ, np.pi/4, 700)
+```
+
+## Performance Notes
+
+- Faraday and Voigt geometries use vectorised array operations (fast)
+- Arbitrary angles require symbolic solving and are significantly slower
+- For arrays of length > 5000, consider using smaller detuning steps for non-analytic angles
+
+---
+
+[Back to Library Reference](./)

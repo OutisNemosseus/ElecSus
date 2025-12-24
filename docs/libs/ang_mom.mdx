@@ -1,0 +1,157 @@
+---
+title: ang_mom.py - Angular Momentum Matrices
+sidebar_label: ang_mom.py
+sidebar_position: 10
+---
+
+# ang_mom.py - Angular Momentum Matrices
+
+<div style={{display: 'flex', gap: '12px', flexWrap: 'wrap', marginBottom: '24px'}}>
+  <a href="/libs/ang_mom.py" download="ang_mom.py"
+    style={{padding: '10px 20px', backgroundColor: '#10b981', color: 'white', borderRadius: '6px', textDecoration: 'none', fontWeight: 'bold'}}>
+    Download .py
+  </a>
+</div>
+
+<div style={{display: 'flex', gap: '24px', marginBottom: '24px', flexWrap: 'wrap'}}>
+  <div style={{padding: '12px 16px', backgroundColor: '#f3f4f6', borderRadius: '8px'}}>
+    <div style={{fontSize: '24px', fontWeight: 'bold', color: '#3776ab'}}>48</div>
+    <div style={{fontSize: '12px', color: '#6b7280'}}>Lines of Code</div>
+  </div>
+  <div style={{padding: '12px 16px', backgroundColor: '#f3f4f6', borderRadius: '8px'}}>
+    <div style={{fontSize: '24px', fontWeight: 'bold', color: '#3776ab'}}>3</div>
+    <div style={{fontSize: '12px', color: '#6b7280'}}>Functions</div>
+  </div>
+</div>
+
+## Description
+
+Return Jx, Jy, Jz matrices for an angular momentum j. Calculates and returns the angular momentum matrices for x, y and z projections.
+
+Called by `fs_hfs.py` and `sz_lsi.py`.
+
+## Dependencies
+
+```python
+from numpy import transpose, dot
+import ang_mom_p
+```
+
+## Functions
+
+### `jx(jj)`
+
+Calculate the x-component angular momentum matrix J_x.
+
+**Arguments:**
+- `jj` - Angular momentum quantum number (half-integer or integer)
+
+**Returns:**
+- J_x matrix of dimension (2j+1) × (2j+1)
+
+**Formula:**
+```
+J_x = (1/2)(J_+ + J_-)
+```
+
+### `jy(jj)`
+
+Calculate the y-component angular momentum matrix J_y.
+
+**Arguments:**
+- `jj` - Angular momentum quantum number
+
+**Returns:**
+- J_y matrix of dimension (2j+1) × (2j+1)
+
+**Formula:**
+```
+J_y = (i/2)(J_- - J_+)
+```
+
+### `jz(jj)`
+
+Calculate the z-component angular momentum matrix J_z.
+
+**Arguments:**
+- `jj` - Angular momentum quantum number
+
+**Returns:**
+- J_z matrix of dimension (2j+1) × (2j+1)
+
+**Formula:**
+```
+J_z = (1/2)(J_+ J_- - J_- J_+)
+```
+
+## Source Code
+
+```python showLineNumbers
+from numpy import transpose, dot
+import ang_mom_p
+
+def jx(jj):
+    jp = ang_mom_p.jp(jj)
+    jm = transpose(jp)
+    jx = 0.5 * (jp + jm)
+    return jx
+
+def jy(jj):
+    jp = ang_mom_p.jp(jj)
+    jm = transpose(jp)
+    jy = 0.5j * (jm - jp)
+    return jy
+
+def jz(jj):
+    jp = ang_mom_p.jp(jj)
+    jm = transpose(jp)
+    jz = 0.5 * (dot(jp, jm) - dot(jm, jp))
+    return jz
+```
+
+## Usage Example
+
+```python
+import numpy as np
+from ang_mom import jx, jy, jz
+
+# Spin-1/2 matrices (Pauli matrices × 1/2)
+Sx = jx(0.5)
+Sy = jy(0.5)
+Sz = jz(0.5)
+
+print("S_x =")
+print(Sx)
+# [[ 0.   0.5]
+#  [ 0.5  0. ]]
+
+print("\nS_z =")
+print(Sz)
+# [[ 0.5  0. ]
+#  [ 0.  -0.5]]
+
+# Verify commutation relation [Jx, Jy] = i*Jz
+commutator = np.dot(Sx, Sy) - np.dot(Sy, Sx)
+print("\n[Sx, Sy] - i*Sz =")
+print(commutator - 1j*Sz)  # Should be zero matrix
+```
+
+## Angular Momentum Properties
+
+For angular momentum j, the matrices satisfy:
+- **Commutation relations**: [J_i, J_j] = iε_ijk J_k
+- **J² eigenvalue**: j(j+1)ℏ²
+- **J_z eigenvalues**: mℏ where m = -j, -j+1, ..., j-1, j
+
+### Matrix Dimensions
+
+| j | Dimension | States |
+|---|-----------|--------|
+| 1/2 | 2×2 | m = ±1/2 |
+| 1 | 3×3 | m = -1, 0, +1 |
+| 3/2 | 4×4 | m = ±1/2, ±3/2 |
+| 2 | 5×5 | m = -2, -1, 0, +1, +2 |
+
+---
+
+[Back to Library Reference](./)

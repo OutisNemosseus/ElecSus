@@ -1,0 +1,203 @@
+---
+title: spectra.py - Main Spectra Calculation
+sidebar_label: spectra.py
+sidebar_position: 2
+---
+
+# spectra.py - Main Spectra Calculation Module
+
+<div style={{display: 'flex', gap: '12px', flexWrap: 'wrap', marginBottom: '24px'}}>
+  <a href="/libs/spectra.py" download="spectra.py"
+    style={{padding: '10px 20px', backgroundColor: '#10b981', color: 'white', borderRadius: '6px', textDecoration: 'none', fontWeight: 'bold'}}>
+    Download .py
+  </a>
+</div>
+
+<div style={{display: 'flex', gap: '24px', marginBottom: '24px', flexWrap: 'wrap'}}>
+  <div style={{padding: '12px 16px', backgroundColor: '#f3f4f6', borderRadius: '8px'}}>
+    <div style={{fontSize: '24px', fontWeight: 'bold', color: '#3776ab'}}>995</div>
+    <div style={{fontSize: '12px', color: '#6b7280'}}>Lines of Code</div>
+  </div>
+  <div style={{padding: '12px 16px', backgroundColor: '#f3f4f6', borderRadius: '8px'}}>
+    <div style={{fontSize: '24px', fontWeight: 'bold', color: '#3776ab'}}>0</div>
+    <div style={{fontSize: '12px', color: '#6b7280'}}>Classes</div>
+  </div>
+  <div style={{padding: '12px 16px', backgroundColor: '#f3f4f6', borderRadius: '8px'}}>
+    <div style={{fontSize: '24px', fontWeight: 'bold', color: '#3776ab'}}>7</div>
+    <div style={{fontSize: '12px', color: '#6b7280'}}>Functions</div>
+  </div>
+</div>
+
+## Description
+
+Module containing functions to calculate the spectra. Constructs the electric susceptibility and then returns the spectrum requested.
+
+This is the main entry point for ElecSus calculations. It provides functions to compute the complex electric susceptibility for alkali metal vapours and calculate various experimental observables.
+
+## Dependencies
+
+```python
+from numpy import zeros, sqrt, pi, dot, exp, sin, cos, array, amax, arange, concatenate, argmin, matmul
+import numpy as np
+from scipy.special import wofz
+from scipy.interpolate import interp1d
+from FundamentalConstants import *
+from numberDensityEqs import *
+import EigenSystem as ES
+import AtomConstants as AC
+import RotationMatrices as RM
+import BasisChanger as BC
+import JonesMatrices as JM
+import solve_dielectric as SD
+```
+
+## Default Parameters
+
+```python
+p_dict_defaults = {
+    'Elem': 'Rb',           # Element (Rb, Cs, K, Na)
+    'Dline': 'D2',          # D-line transition (D1 or D2)
+    'lcell': 75e-3,         # Cell length in metres
+    'Bfield': 0.,           # Magnetic field in Gauss
+    'T': 20.,               # Temperature in Celsius
+    'GammaBuf': 0.,         # Buffer gas broadening (MHz)
+    'shift': 0.,            # Frequency shift (MHz)
+    'theta0': 0.,           # Polarisation angle (degrees)
+    'Pol': 50.,             # Polarisation percentage
+    'Btheta': 0,            # B-field polar angle
+    'Bphi': 0,              # B-field azimuthal angle
+    'Constrain': True,      # Constrain Doppler temp to T
+    'DoppTemp': 20.,        # Doppler temperature
+    'rb85frac': 72.17,      # Rb-85 abundance (%)
+    'K40frac': 0.01,        # K-40 abundance (%)
+    'K41frac': 6.73,        # K-41 abundance (%)
+    'BoltzmannFactor': True # Include Boltzmann factors
+}
+```
+
+## Functions
+
+### `FreqStren(groundLevels, excitedLevels, groundDim, excitedDim, Dline, hand, BoltzmannFactor=True, T=293.16)`
+
+Calculate transition frequencies and strengths by taking dot products of relevant parts of the ground/excited state eigenvectors.
+
+**Arguments:**
+- `groundLevels` - Ground state manifold
+- `excitedLevels` - Excited state manifold
+- `groundDim` - Dimension of ground state
+- `excitedDim` - Dimension of excited state
+- `Dline` - 'D1' or 'D2'
+- `hand` - Polarisation ('Left', 'Right', 'Z')
+- `BoltzmannFactor` - Include thermal population
+- `T` - Temperature in Kelvin
+
+**Returns:**
+- `transitionFrequency` - Array of transition frequencies (MHz)
+- `transitionStrength` - Array of transition strengths
+- `transNo` - Number of transitions
+
+### `add_voigt(d, DoppTemp, atomMass, wavenumber, gamma, voigtwidth, ...)`
+
+Add Voigt profile contributions from all transitions to the detuning axis.
+
+### `calc_chi(X, p_dict, verbose=False)`
+
+Computes the complex susceptibility for sigma plus/minus and pi transitions as a 1D array.
+
+**Arguments:**
+- `X` - Detuning axis (MHz)
+- `p_dict` - Parameter dictionary
+- `verbose` - Print debug information
+
+**Returns:**
+- `totalChiPlus` - Susceptibility for sigma+ transitions
+- `totalChiMinus` - Susceptibility for sigma- transitions
+- `totalChiZ` - Susceptibility for pi transitions
+
+### `get_Efield(X, E_in, Chi, p_dict, verbose=False)`
+
+Most general form of calculation - returns the electric field vector E_out.
+
+The electric field is in the lab frame, in the X/Y/Z basis:
+- Light propagation is along the Z axis
+- X is horizontal, Y is vertical
+
+**Arguments:**
+- `X` - Detuning in MHz
+- `E_in` - Input electric field array [Ex, Ey, Ez]
+- `Chi` - Susceptibility array [ChiPlus, ChiMinus, ChiZ]
+- `p_dict` - Parameter dictionary
+
+**Returns:**
+- `E_out` - Output electric field vector
+- `R` - Rotation matrix
+
+### `get_spectra(X, E_in, p_dict, outputs=None)`
+
+Main calculation function. Calls `get_Efield()` to get the electric field, then uses Jones matrices to calculate experimentally useful quantities.
+
+**Arguments:**
+- `X` - Detuning range (MHz)
+- `E_in` - Input electric field vector
+- `p_dict` - Parameter dictionary
+- `outputs` - List of output types to return
+
+**Available Outputs:**
+| Output | Description |
+|--------|-------------|
+| `S0` | Total transmission (Stokes parameter) |
+| `S1` | Stokes parameter Ix - Iy |
+| `S2` | Stokes parameter I+45 - I-45 |
+| `S3` | Stokes parameter Ir - Il |
+| `Ix` | Intensity through x-polariser |
+| `Iy` | Intensity through y-polariser |
+| `Il` | Left-circular intensity |
+| `Ir` | Right-circular intensity |
+| `alphaPlus` | Absorption coefficient (sigma+) |
+| `alphaMinus` | Absorption coefficient (sigma-) |
+| `alphaZ` | Absorption coefficient (pi) |
+| `E_out` | Output electric field |
+| `Chi` | All susceptibility components |
+
+**Example:**
+```python
+import numpy as np
+from elecsus.libs.spectra import get_spectra
+
+# Detuning range
+detuning = np.linspace(-10000, 10000, 1000)
+
+# Linear polarisation along x
+E_in = np.array([1, 0, 0])
+
+# Parameters for Cs D2 at 100 G
+p_dict = {
+    'Elem': 'Cs',
+    'Dline': 'D2',
+    'Bfield': 100,
+    'T': 21,
+    'lcell': 75e-3
+}
+
+# Calculate transmission
+[transmission] = get_spectra(detuning, E_in, p_dict, outputs=['S0'])
+```
+
+### `output_list()`
+
+Helper method that prints all possible outputs from `get_spectra()`.
+
+## Source Code
+
+```python showLineNumbers
+# Copyright 2014-2018 M. A. Zentile, J. Keaveney, L. Weller, D. Whiting,
+# C. S. Adams and I. G. Hughes.
+# Licensed under the Apache License, Version 2.0
+# Last updated 2018-07-12 MAZ
+```
+
+See the full source in the [libs/spectra.py](../../libs/spectra.py) file.
+
+---
+
+[Back to Library Reference](./)

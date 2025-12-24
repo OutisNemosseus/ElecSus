@@ -1,0 +1,156 @@
+---
+title: EigenSystem.py - Hamiltonian Calculations
+sidebar_label: EigenSystem.py
+sidebar_position: 5
+---
+
+# EigenSystem.py - Atomic Hamiltonian Module
+
+<div style={{display: 'flex', gap: '12px', flexWrap: 'wrap', marginBottom: '24px'}}>
+  <a href="/libs/EigenSystem.py" download="EigenSystem.py"
+    style={{padding: '10px 20px', backgroundColor: '#10b981', color: 'white', borderRadius: '6px', textDecoration: 'none', fontWeight: 'bold'}}>
+    Download .py
+  </a>
+</div>
+
+<div style={{display: 'flex', gap: '24px', marginBottom: '24px', flexWrap: 'wrap'}}>
+  <div style={{padding: '12px 16px', backgroundColor: '#f3f4f6', borderRadius: '8px'}}>
+    <div style={{fontSize: '24px', fontWeight: 'bold', color: '#3776ab'}}>165</div>
+    <div style={{fontSize: '12px', color: '#6b7280'}}>Lines of Code</div>
+  </div>
+  <div style={{padding: '12px 16px', backgroundColor: '#f3f4f6', borderRadius: '8px'}}>
+    <div style={{fontSize: '24px', fontWeight: 'bold', color: '#3776ab'}}>1</div>
+    <div style={{fontSize: '12px', color: '#6b7280'}}>Classes</div>
+  </div>
+</div>
+
+## Description
+
+Calculates the atomic Hamiltonian for a given isotope and magnetic field. This module constructs the ground state and excited state manifolds including:
+- Hyperfine structure
+- Zeeman interaction with applied magnetic field
+- Fine structure splitting
+
+Called by `spectra.py`.
+
+## Dependencies
+
+```python
+from scipy.linalg import eig, eigh
+from numpy import pi, append, transpose, identity
+from AtomConstants import *
+from FundamentalConstants import *
+from sz_lsi import sz, lz, Iz
+from fs_hfs import Hfs, Hhfs, Bbhfs
+```
+
+## Classes
+
+### `Hamiltonian`
+
+Functions to create the atomic Hamiltonian.
+
+#### Constructor
+
+```python
+Hamiltonian(Isotope, Trans, gL, Bfield)
+```
+
+**Arguments:**
+- `Isotope` - Isotope identifier ('Rb87', 'Rb85', 'Cs', 'K39', 'K40', 'K41', 'Na', 'IdealAtom')
+- `Trans` - Transition ('D1' or 'D2')
+- `gL` - Orbital g-factor (typically 1.0)
+- `Bfield` - Magnetic field strength in Gauss
+
+#### Attributes
+
+| Attribute | Type | Description |
+|-----------|------|-------------|
+| `atom` | class | Atom constants class |
+| `ds` | int | Dimension of ground S-term matrix |
+| `dp` | int | Dimension of excited P-term matrix |
+| `groundManifold` | list | Sorted eigenstates of ground manifold |
+| `groundEnergies` | array | Ground state eigenvalues |
+| `excitedManifold` | list | Sorted eigenstates of excited manifold |
+| `excitedEnergies` | array | Excited state eigenvalues |
+
+#### Methods
+
+##### `groundStateManifold(gI, I, A_hyp_coeff, IsotopeShift, Bfield)`
+
+Produces the ground state manifold.
+
+**Arguments:**
+- `gI` - Nuclear g-factor
+- `I` - Nuclear spin
+- `A_hyp_coeff` - Ground state hyperfine A coefficient (MHz)
+- `IsotopeShift` - Isotope shift (MHz)
+- `Bfield` - Magnetic field (Gauss)
+
+**Returns:**
+- `sortedManifold` - Eigenstates sorted by energy
+- `EigenValues` - Energy eigenvalues (MHz)
+
+##### `excitedStateManifold(gL, gI, I, A_hyp_coeff, B_hyp_coeff, Bfield)`
+
+Produces the excited state manifold.
+
+**Arguments:**
+- `gL` - Orbital g-factor
+- `gI` - Nuclear g-factor
+- `I` - Nuclear spin
+- `A_hyp_coeff` - Excited state hyperfine A coefficient (MHz)
+- `B_hyp_coeff` - Excited state hyperfine B coefficient (MHz)
+- `Bfield` - Magnetic field (Gauss)
+
+**Returns:**
+- `sortedManifold` - Eigenstates sorted by energy
+- `EigenValues` - Energy eigenvalues (MHz)
+
+## Physics
+
+### Ground State Hamiltonian
+
+The ground state Hamiltonian includes:
+
+1. **Hyperfine interaction**: H_hfs = A_s (I · J)
+2. **Isotope shift**: Shifts the entire manifold
+3. **Zeeman interaction**: H_Z = μ_B B (g_s S_z + g_I I_z)
+
+### Excited State Hamiltonian
+
+The excited state Hamiltonian includes:
+
+1. **Fine structure**: H_fs = Δ_FS (L · S)
+2. **Hyperfine interaction**: H_hfs = A_p (I · J) + B_p Q
+3. **Zeeman interaction**: H_Z = μ_B B (g_L L_z + g_s S_z + g_I I_z)
+
+where Q is the electric quadrupole interaction.
+
+## Usage Example
+
+```python
+from EigenSystem import Hamiltonian
+
+# Create Hamiltonian for Rb-87 D2 line at 100 Gauss
+H = Hamiltonian('Rb87', 'D2', 1.0, 100)
+
+# Access manifold dimensions
+print(f"Ground state dimension: {H.ds}")
+print(f"Excited state dimension: {H.dp}")
+
+# Get ground state energies
+for i, state in enumerate(H.groundManifold):
+    energy = state[0].real
+    print(f"State {i}: E = {energy:.3f} MHz")
+```
+
+## Output Structure
+
+Each element of `groundManifold` and `excitedManifold` is a list containing:
+- Index 0: Energy eigenvalue (complex, but typically real)
+- Indices 1 onwards: Components of the eigenvector in the |m_L, m_S, m_I⟩ basis
+
+---
+
+[Back to Library Reference](./)

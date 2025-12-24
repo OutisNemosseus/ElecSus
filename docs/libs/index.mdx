@@ -1,0 +1,136 @@
+---
+title: ElecSus Library Reference
+sidebar_label: Library Reference
+sidebar_position: 1
+---
+
+# ElecSus Library Reference
+
+The ElecSus library provides a comprehensive set of Python modules for calculating the electric susceptibility of alkali-metal vapours. This documentation covers all modules in the `libs` folder.
+
+## Module Overview
+
+<div style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '16px', marginBottom: '32px'}}>
+
+<div style={{border: '1px solid #e5e7eb', borderRadius: '8px', padding: '16px', backgroundColor: '#fafafa'}}>
+  <h3 style={{margin: '0 0 8px 0', color: '#3776ab'}}>Core Physics</h3>
+  <ul style={{margin: 0, paddingLeft: '20px'}}>
+    <li><a href="./spectra">spectra.py</a> - Main spectra calculation</li>
+    <li><a href="./EigenSystem">EigenSystem.py</a> - Hamiltonian calculations</li>
+    <li><a href="./solve_dielectric">solve_dielectric.py</a> - Dielectric tensor solver</li>
+  </ul>
+</div>
+
+<div style={{border: '1px solid #e5e7eb', borderRadius: '8px', padding: '16px', backgroundColor: '#fafafa'}}>
+  <h3 style={{margin: '0 0 8px 0', color: '#3776ab'}}>Constants</h3>
+  <ul style={{margin: 0, paddingLeft: '20px'}}>
+    <li><a href="./AtomConstants">AtomConstants.py</a> - Atomic constants</li>
+    <li><a href="./FundamentalConstants">FundamentalConstants.py</a> - Physical constants</li>
+    <li><a href="./numberDensityEqs">numberDensityEqs.py</a> - Number density equations</li>
+  </ul>
+</div>
+
+<div style={{border: '1px solid #e5e7eb', borderRadius: '8px', padding: '16px', backgroundColor: '#fafafa'}}>
+  <h3 style={{margin: '0 0 8px 0', color: '#3776ab'}}>Angular Momentum</h3>
+  <ul style={{margin: 0, paddingLeft: '20px'}}>
+    <li><a href="./ang_mom">ang_mom.py</a> - Angular momentum matrices</li>
+    <li><a href="./ang_mom_p">ang_mom_p.py</a> - Ladder operators</li>
+    <li><a href="./sz_lsi">sz_lsi.py</a> - Z-projection matrices</li>
+    <li><a href="./fs_hfs">fs_hfs.py</a> - Fine/hyperfine structure</li>
+  </ul>
+</div>
+
+<div style={{border: '1px solid #e5e7eb', borderRadius: '8px', padding: '16px', backgroundColor: '#fafafa'}}>
+  <h3 style={{margin: '0 0 8px 0', color: '#3776ab'}}>Polarisation & Optics</h3>
+  <ul style={{margin: 0, paddingLeft: '20px'}}>
+    <li><a href="./JonesMatrices">JonesMatrices.py</a> - Jones matrices</li>
+    <li><a href="./BasisChanger">BasisChanger.py</a> - Basis transformations</li>
+    <li><a href="./RotationMatrices">RotationMatrices.py</a> - Rotation matrices</li>
+  </ul>
+</div>
+
+<div style={{border: '1px solid #e5e7eb', borderRadius: '8px', padding: '16px', backgroundColor: '#fafafa'}}>
+  <h3 style={{margin: '0 0 8px 0', color: '#3776ab'}}>Fitting Routines</h3>
+  <ul style={{margin: 0, paddingLeft: '20px'}}>
+    <li><a href="./MLFittingRoutine">MLFittingRoutine.py</a> - Marquardt-Levenberg</li>
+    <li><a href="./RRFittingRoutine">RRFittingRoutine.py</a> - Random restart</li>
+    <li><a href="./SAFittingRoutine">SAFittingRoutine.py</a> - Simulated annealing</li>
+  </ul>
+</div>
+
+<div style={{border: '1px solid #e5e7eb', borderRadius: '8px', padding: '16px', backgroundColor: '#fafafa'}}>
+  <h3 style={{margin: '0 0 8px 0', color: '#3776ab'}}>Utilities</h3>
+  <ul style={{margin: 0, paddingLeft: '20px'}}>
+    <li><a href="./data_proc">data_proc.py</a> - Data processing</li>
+    <li><a href="./durhamcolours">durhamcolours.py</a> - Durham colour palette</li>
+    <li><a href="./preamble">preamble.py</a> - GUI variables</li>
+  </ul>
+</div>
+
+</div>
+
+## Architecture
+
+The library follows a modular architecture where each component has a single responsibility:
+
+```
+libs/
+├── Core Physics
+│   ├── spectra.py          # Main entry point for calculations
+│   ├── EigenSystem.py      # Atomic Hamiltonian solver
+│   └── solve_dielectric.py # Dielectric tensor solutions
+│
+├── Constants
+│   ├── FundamentalConstants.py  # CODATA physical constants
+│   ├── AtomConstants.py         # Alkali atom properties
+│   └── numberDensityEqs.py      # Vapour pressure equations
+│
+├── Quantum Mechanics
+│   ├── ang_mom.py     # Jx, Jy, Jz matrices
+│   ├── ang_mom_p.py   # J+ ladder operator
+│   ├── sz_lsi.py      # Spin projections
+│   └── fs_hfs.py      # Fine/hyperfine coupling
+│
+├── Optics
+│   ├── JonesMatrices.py    # Polarisation matrices
+│   ├── BasisChanger.py     # xyz ↔ LRz conversion
+│   └── RotationMatrices.py # 3D rotations
+│
+└── Fitting
+    ├── MLFittingRoutine.py # Levenberg-Marquardt
+    ├── RRFittingRoutine.py # Random restart
+    └── SAFittingRoutine.py # Simulated annealing
+```
+
+## Quick Start
+
+```python
+import numpy as np
+from elecsus.libs import spectra
+
+# Define detuning range (MHz)
+detuning = np.linspace(-10000, 10000, 1000)
+
+# Define input electric field (linear polarisation along x)
+E_in = np.array([1, 0, 0])
+
+# Define parameters
+p_dict = {
+    'Elem': 'Rb',
+    'Dline': 'D2',
+    'T': 20,         # Temperature in Celsius
+    'lcell': 75e-3,  # Cell length in metres
+    'Bfield': 0,     # Magnetic field in Gauss
+}
+
+# Calculate spectrum
+[transmission] = spectra.get_spectra(detuning, E_in, p_dict, outputs=['S0'])
+```
+
+## License
+
+ElecSus is licensed under the Apache License, Version 2.0.
+
+---
+
+*Documentation generated with [Program Docs Generator](../scripts/README.md)*

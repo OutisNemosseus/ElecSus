@@ -1,0 +1,161 @@
+---
+title: data_proc.py - Data Processing
+sidebar_label: data_proc.py
+sidebar_position: 18
+---
+
+# data_proc.py - Data Processing Tools
+
+<div style={{display: 'flex', gap: '12px', flexWrap: 'wrap', marginBottom: '24px'}}>
+  <a href="/libs/data_proc.py" download="data_proc.py"
+    style={{padding: '10px 20px', backgroundColor: '#10b981', color: 'white', borderRadius: '6px', textDecoration: 'none', fontWeight: 'bold'}}>
+    Download .py
+  </a>
+</div>
+
+<div style={{display: 'flex', gap: '24px', marginBottom: '24px', flexWrap: 'wrap'}}>
+  <div style={{padding: '12px 16px', backgroundColor: '#f3f4f6', borderRadius: '8px'}}>
+    <div style={{fontSize: '24px', fontWeight: 'bold', color: '#3776ab'}}>67</div>
+    <div style={{fontSize: '12px', color: '#6b7280'}}>Lines of Code</div>
+  </div>
+  <div style={{padding: '12px 16px', backgroundColor: '#f3f4f6', borderRadius: '8px'}}>
+    <div style={{fontSize: '24px', fontWeight: 'bold', color: '#3776ab'}}>2</div>
+    <div style={{fontSize: '12px', color: '#6b7280'}}>Functions</div>
+  </div>
+</div>
+
+## Description
+
+Data processing tools - binning and moving average smoothing.
+
+## Dependencies
+
+```python
+import numpy as np
+```
+
+## Functions
+
+### `bin_data(x, y, blength)`
+
+Takes 2 arrays x and y and bins them into groups of blength.
+
+**Arguments:**
+- `x` - Independent variable array
+- `y` - Dependent variable array
+- `blength` - Bin length (will be made odd if even)
+
+**Returns:**
+- `xout` - Binned x values (bin centres)
+- `yout` - Binned y values (means)
+- `yerrout` - Standard deviation within each bin
+
+**Algorithm:**
+1. Ensure bin length is odd (subtract 1 if even)
+2. Calculate number of complete bins
+3. For each bin:
+   - Take mean of x values → xout
+   - Take mean of y values → yout
+   - Take std deviation of y values → yerrout
+
+### `smooth_data(data, degree, dropVals=False)`
+
+Performs moving triangle smoothing with a variable degree.
+
+**Arguments:**
+- `data` - Input data array
+- `degree` - Smoothing degree (window half-width)
+- `dropVals` - If True, return shortened array; if False, pad edges
+
+**Returns:**
+- Smoothed data array
+
+**Algorithm:**
+Uses a triangular weighting kernel:
+```
+weights = [1, 2, 3, ..., degree, degree+1, degree, ..., 3, 2, 1]
+```
+The smoothed value at each point is the weighted average over the window.
+
+## Source Code
+
+```python showLineNumbers
+import numpy as np
+
+def bin_data(x, y, blength):
+    """ Takes 2 arrays x and y and bins them into groups of blength. """
+    if blength % 2 == 0:
+        blength -= 1
+    nobins = int(len(x) / blength)
+    xmid = (blength - 1) / 2
+    xbinmax = nobins * blength - xmid
+
+    xout, yout, yerrout = np.array([]), np.array([]), np.array([])
+    for i in range(int(xmid), int(xbinmax), int(blength)):
+        xmin = i - int(xmid)
+        xmax = i + int(xmid)
+        xout = np.append(xout, sum(x[xmin:xmax+1]) / blength)
+        yout = np.append(yout, sum(y[xmin:xmax+1]) / blength)
+        yerrout = np.append(yerrout, np.std(y[xmin:xmax+1]))
+    return xout, yout, yerrout
+
+def smooth_data(data, degree, dropVals=False):
+    """Performs moving triangle smoothing with a variable degree."""
+    triangle = np.array(list(range(degree)) + [degree] +
+                        list(range(degree))[::-1]) + 1
+    smoothed = []
+    for i in range(degree, len(data) - degree*2):
+        point = data[i:i+len(triangle)] * triangle
+        smoothed.append(sum(point) / sum(triangle))
+
+    if dropVals:
+        return smoothed
+    # Pad edges with repeated values
+    smoothed = [smoothed[0]] * (degree + degree//2) + smoothed
+    # ... (edge handling)
+    return np.array(smoothed)
+```
+
+## Usage Example
+
+```python
+import numpy as np
+import matplotlib.pyplot as plt
+from data_proc import bin_data, smooth_data
+
+# Generate noisy data
+x = np.linspace(0, 10, 1000)
+y = np.sin(x) + np.random.randn(len(x)) * 0.2
+
+# Binning
+xbin, ybin, yerr = bin_data(x, y, 20)
+plt.figure(figsize=(12, 4))
+
+plt.subplot(1, 2, 1)
+plt.plot(x, y, 'b.', alpha=0.3, label='Raw')
+plt.errorbar(xbin, ybin, yerr=yerr, fmt='ro', label='Binned')
+plt.legend()
+plt.title('Binning')
+
+# Smoothing
+y_smooth = smooth_data(y, degree=10)
+plt.subplot(1, 2, 2)
+plt.plot(x, y, 'b.', alpha=0.3, label='Raw')
+plt.plot(x, y_smooth, 'r-', lw=2, label='Smoothed')
+plt.legend()
+plt.title('Triangle Smoothing')
+
+plt.tight_layout()
+plt.show()
+```
+
+## Notes
+
+- Binning reduces data size by factor of `blength`
+- Smoothing preserves data size (unless `dropVals=True`)
+- Both methods help reduce noise for fitting or visualisation
+- Triangle smoothing gives more weight to central points than simple moving average
+
+---
+
+[Back to Library Reference](./)

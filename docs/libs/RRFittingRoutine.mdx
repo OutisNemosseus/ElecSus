@@ -1,0 +1,147 @@
+---
+title: RRFittingRoutine.py - Random Restart Fitting
+sidebar_label: RRFittingRoutine.py
+sidebar_position: 16
+---
+
+# RRFittingRoutine.py - Random Restart Fitting
+
+<div style={{display: 'flex', gap: '12px', flexWrap: 'wrap', marginBottom: '24px'}}>
+  <a href="/libs/RRFittingRoutine.py" download="RRFittingRoutine.py"
+    style={{padding: '10px 20px', backgroundColor: '#10b981', color: 'white', borderRadius: '6px', textDecoration: 'none', fontWeight: 'bold'}}>
+    Download .py
+  </a>
+</div>
+
+<div style={{display: 'flex', gap: '24px', marginBottom: '24px', flexWrap: 'wrap'}}>
+  <div style={{padding: '12px 16px', backgroundColor: '#f3f4f6', borderRadius: '8px'}}>
+    <div style={{fontSize: '24px', fontWeight: 'bold', color: '#3776ab'}}>203</div>
+    <div style={{fontSize: '12px', color: '#6b7280'}}>Lines of Code</div>
+  </div>
+  <div style={{padding: '12px 16px', backgroundColor: '#f3f4f6', borderRadius: '8px'}}>
+    <div style={{fontSize: '24px', fontWeight: 'bold', color: '#3776ab'}}>2</div>
+    <div style={{fontSize: '12px', color: '#6b7280'}}>Functions</div>
+  </div>
+</div>
+
+## Description
+
+Random restart fitting routine. Fit by taking random samples around initial parameters and then fitting using Marquardt-Levenberg from each starting point. The best result is selected.
+
+Uses multiprocessing to parallelise the fits across CPU cores.
+
+## Dependencies
+
+```python
+import numpy as np
+import matplotlib.pyplot as plt
+import psutil
+from multiprocessing import Pool
+import MLFittingRoutine as ML
+import lmfit as lm
+from spectra import get_spectra
+```
+
+## Functions
+
+### `evaluate(args)`
+
+Evaluate a single ML fit from a given starting point.
+
+**Arguments:**
+- `args` - Tuple of (data, E_in, p_dict, p_dict_bools, data_type)
+
+**Returns:**
+- Tuple of (reduced_chi_squared, best_params)
+
+### `RR_fit(data, E_in, p_dict, p_dict_bools, p_dict_bounds=None, no_evals=None, data_type='S0', verbose=False)`
+
+Random restart fitting method.
+
+**Arguments:**
+- `data` - [x, y] arrays of experimental data
+- `E_in` - Input electric field
+- `p_dict` - Parameter dictionary with initial values
+- `p_dict_bools` - Dict specifying which parameters to vary
+- `p_dict_bounds` - Dict with deviation range for each parameter (not strict bounds!)
+- `no_evals` - Number of random starting points (default: nParams² + 5)
+- `data_type` - Output type to fit
+- `verbose` - Print debug info
+
+**Returns:**
+- `best_values` - Dictionary of best-fit parameter values
+- `final_result` - lmfit result object from best fit
+
+## Default Parameter Bounds
+
+```python
+p_dict_bounds_default = {
+    'lcell': 1e-3,      # ± 1 mm
+    'Bfield': 100.,     # ± 100 G
+    'T': 20.,           # ± 20 °C
+    'GammaBuf': 20.,    # ± 20 MHz
+    'shift': 100.,      # ± 100 MHz
+    'theta0': 10.,      # ± 10°
+    'E_x': 0.05,
+    'E_y': 0.05,
+    'E_phase': 0.01,
+    'Btheta': 10*π/180, # ± 10°
+    'Bphi': 10*π/180,
+    'DoppTemp': 20.,
+    'rb85frac': 1,
+    'K40frac': 1,
+    'K41frac': 1,
+}
+```
+
+## Algorithm
+
+1. Generate `no_evals` random starting points:
+   - Each parameter is sampled uniformly within ± bounds from initial value
+2. Run ML fit from each starting point in parallel
+3. Select the fit with lowest reduced chi-squared
+4. Return best parameters and result
+
+## Usage Example
+
+```python
+import numpy as np
+from RRFittingRoutine import RR_fit
+from spectra import get_spectra
+
+# Generate test data
+x = np.linspace(-10000, 10000, 200)
+E_in = np.array([0.7, 0.7, 0])
+p_dict_true = {'Elem': 'Rb', 'Dline': 'D2', 'T': 80,
+               'lcell': 2e-3, 'Bfield': 600, 'Btheta': 0,
+               'Bphi': 0, 'GammaBuf': 0, 'shift': 0}
+
+[y] = get_spectra(x, E_in, p_dict_true, outputs=['S1'])
+y_noisy = y.real + np.random.randn(len(x)) * 0.015
+data = [x, y_noisy]
+
+# Set up fit
+E_in_angle = [0.7, [0.7, 0.0]]
+p_dict = {'Elem': 'Rb', 'Dline': 'D2', 'T': 70,
+          'lcell': 2e-3, 'Bfield': 500, 'Btheta': 0,
+          'Bphi': 0, 'GammaBuf': 0, 'shift': 0}
+
+p_dict_bools = {'T': True, 'Bfield': True, 'E_x': True}
+p_dict_bounds = {'T': 10, 'Bfield': 100, 'E_x': 0.01}
+
+# Run random restart fit (8 starting points)
+best_params, result = RR_fit(data, E_in_angle, p_dict, p_dict_bools,
+                              p_dict_bounds, no_evals=8, data_type='S1')
+
+print(result.fit_report())
+```
+
+## Performance Notes
+
+- Uses `multiprocessing.Pool()` to parallelise across all CPU cores
+- For N fit parameters, default number of evaluations is N² + 5
+- Each evaluation runs a full ML fit, so total time ≈ no_evals × single_fit_time / num_cores
+
+---
+
+[Back to Library Reference](./)

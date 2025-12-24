@@ -1,0 +1,177 @@
+---
+title: numberDensityEqs.py - Number Density Equations
+sidebar_label: numberDensityEqs.py
+sidebar_position: 14
+---
+
+# numberDensityEqs.py - Vapour Number Density Equations
+
+<div style={{display: 'flex', gap: '12px', flexWrap: 'wrap', marginBottom: '24px'}}>
+  <a href="/libs/numberDensityEqs.py" download="numberDensityEqs.py"
+    style={{padding: '10px 20px', backgroundColor: '#10b981', color: 'white', borderRadius: '6px', textDecoration: 'none', fontWeight: 'bold'}}>
+    Download .py
+  </a>
+</div>
+
+<div style={{display: 'flex', gap: '24px', marginBottom: '24px', flexWrap: 'wrap'}}>
+  <div style={{padding: '12px 16px', backgroundColor: '#f3f4f6', borderRadius: '8px'}}>
+    <div style={{fontSize: '24px', fontWeight: 'bold', color: '#3776ab'}}>89</div>
+    <div style={{fontSize: '12px', color: '#6b7280'}}>Lines of Code</div>
+  </div>
+  <div style={{padding: '12px 16px', backgroundColor: '#f3f4f6', borderRadius: '8px'}}>
+    <div style={{fontSize: '24px', fontWeight: 'bold', color: '#3776ab'}}>5</div>
+    <div style={{fontSize: '12px', color: '#6b7280'}}>Functions</div>
+  </div>
+</div>
+
+## Description
+
+Functions to calculate the different number densities for alkali metal vapours. All formulae take temperature in Kelvin and return atomic number densities in m⁻³.
+
+Based on values from: C. B. Alcock, V. P. Itkin and M. K. Horrigan, *Can. Metall. Q.* **23** (1984) 309-313.
+
+## Dependencies
+
+```python
+from FundamentalConstants import kB
+from numpy import log10
+```
+
+## Functions
+
+### `CalcNumberDensity(T, atom)`
+
+Helper function that calls the appropriate element-specific function.
+
+**Arguments:**
+- `T` - Temperature in Kelvin
+- `atom` - Atom identifier ('Rb', 'Rb85', 'Rb87', 'Cs', 'K', 'K39', 'K40', 'K41', 'Na')
+
+**Returns:**
+- Number density in m⁻³
+
+### `numDenRb(T)`
+
+Calculate rubidium number density.
+
+**Arguments:**
+- `T` - Temperature in Kelvin
+
+**Returns:**
+- Number density in m⁻³
+
+**Formula:**
+```
+T < 312.46 K (solid):
+  log₁₀(p) = 4.857 - 4215/T
+
+T ≥ 312.46 K (liquid):
+  log₁₀(p) = 8.316 - 4275/T - 1.3102·log₁₀(T)
+
+N = 101325·p / (k_B·T)
+```
+
+### `numDenCs(T)`
+
+Calculate caesium number density.
+
+**Formula:**
+```
+T < 301.65 K (solid):
+  log₁₀(p) = 4.711 - 3999/T
+
+T ≥ 301.65 K (liquid):
+  log₁₀(p) = 8.232 - 4062/T - 1.3359·log₁₀(T)
+```
+
+### `numDenK(T)`
+
+Calculate potassium number density.
+
+**Formula:**
+```
+T < 336.8 K (solid):
+  log₁₀(p) = 4.961 - 4646/T
+
+T ≥ 336.8 K (liquid):
+  log₁₀(p) = 8.233 - 4693/T - 1.2403·log₁₀(T)
+```
+
+### `numDenNa(T)`
+
+Calculate sodium number density.
+
+**Formula:**
+```
+T < 370.95 K (solid):
+  log₁₀(p) = 5.298 - 5603/T
+
+T ≥ 370.95 K (liquid):
+  log₁₀(p) = 8.400 - 5634/T - 1.1748·log₁₀(T)
+```
+
+## Source Code
+
+```python showLineNumbers
+from FundamentalConstants import kB
+from numpy import log10
+
+def numDenRb(T):
+    """Calculates the rubidium number density"""
+    if T < 312.46:
+        p = 10.0**(4.857 - 4215./T)
+    else:
+        p = 10.0**(8.316 - 4275./T - 1.3102*log10(T))
+    NumberDensity = 101325.0*p / (kB*T)
+    return NumberDensity
+
+def numDenCs(T):
+    '''Caesium number density'''
+    if T < 301.65:
+        p = 10.0**(4.711 - 3999./T)
+    else:
+        p = 10.0**(8.232 - 4062./T - 1.3359*log10(T))
+    NumberDensity = 101325.0*p / (kB*T)
+    return NumberDensity
+```
+
+## Usage Example
+
+```python
+import numpy as np
+import matplotlib.pyplot as plt
+from numberDensityEqs import numDenRb, numDenCs, numDenK, numDenNa
+
+# Temperature range (Kelvin)
+T_celsius = np.linspace(20, 200, 100)
+T_kelvin = T_celsius + 273.15
+
+# Calculate number densities
+n_Rb = [numDenRb(T) for T in T_kelvin]
+n_Cs = [numDenCs(T) for T in T_kelvin]
+n_K = [numDenK(T) for T in T_kelvin]
+n_Na = [numDenNa(T) for T in T_kelvin]
+
+# Plot
+plt.semilogy(T_celsius, n_Rb, label='Rb')
+plt.semilogy(T_celsius, n_Cs, label='Cs')
+plt.semilogy(T_celsius, n_K, label='K')
+plt.semilogy(T_celsius, n_Na, label='Na')
+plt.xlabel('Temperature (°C)')
+plt.ylabel('Number density (m⁻³)')
+plt.legend()
+plt.show()
+```
+
+## Number Density Values
+
+| Temp (°C) | Rb (m⁻³) | Cs (m⁻³) | K (m⁻³) | Na (m⁻³) |
+|-----------|----------|----------|---------|----------|
+| 20 | 3.3×10¹⁵ | 1.4×10¹⁶ | 3.0×10¹³ | 3.2×10⁸ |
+| 50 | 6.9×10¹⁶ | 2.2×10¹⁷ | 9.1×10¹⁴ | 2.1×10¹⁰ |
+| 100 | 3.0×10¹⁸ | 6.2×10¹⁸ | 5.8×10¹⁶ | 4.2×10¹² |
+| 150 | 4.6×10¹⁹ | 6.7×10¹⁹ | 1.1×10¹⁸ | 1.9×10¹⁴ |
+
+---
+
+[Back to Library Reference](./)

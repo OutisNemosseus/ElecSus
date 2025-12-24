@@ -1,0 +1,53 @@
+{
+  "name": "program-docs-generator",
+  "version": "2.0.0",
+  "description": "SOLID-compliant documentation generator for academic programs",
+  "main": "src/index.js",
+  "bin": {
+    "generate-docs": "src/index.js"
+  },
+  "scripts": {
+    "start": "node src/index.js",
+    "watch": "node src/index.js --watch",
+    "clean": "node src/index.js --clean",
+    "inbox": "node watch-inbox.js",
+    "inbox:watch": "node watch-inbox.js --watch",
+    "inbox:process": "node watch-inbox.js --process",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage"
+  },
+  "keywords": [
+    "documentation",
+    "generator",
+    "docusaurus",
+    "mdx",
+    "academic"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "chokidar": "^3.5.3"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "testMatch": [
+      "**/tests/**/*.test.js"
+    ],
+    "collectCoverageFrom": [
+      "src/**/*.js",
+      "!src/index.js"
+    ],
+    "coverageThreshold": {
+      "global": {
+        "branches": 70,
+        "functions": 80,
+        "lines": 80,
+        "statements": 80
+      }
+    }
+  }
+}

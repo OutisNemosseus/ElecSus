@@ -1,0 +1,133 @@
+---
+title: JonesMatrices.py - Jones Matrices
+sidebar_label: JonesMatrices.py
+sidebar_position: 7
+---
+
+# JonesMatrices.py - Jones Matrices for Polarisers
+
+<div style={{display: 'flex', gap: '12px', flexWrap: 'wrap', marginBottom: '24px'}}>
+  <a href="/libs/JonesMatrices.py" download="JonesMatrices.py"
+    style={{padding: '10px 20px', backgroundColor: '#10b981', color: 'white', borderRadius: '6px', textDecoration: 'none', fontWeight: 'bold'}}>
+    Download .py
+  </a>
+</div>
+
+<div style={{display: 'flex', gap: '24px', marginBottom: '24px', flexWrap: 'wrap'}}>
+  <div style={{padding: '12px 16px', backgroundColor: '#f3f4f6', borderRadius: '8px'}}>
+    <div style={{fontSize: '24px', fontWeight: 'bold', color: '#3776ab'}}>50</div>
+    <div style={{fontSize: '12px', color: '#6b7280'}}>Lines of Code</div>
+  </div>
+  <div style={{padding: '12px 16px', backgroundColor: '#f3f4f6', borderRadius: '8px'}}>
+    <div style={{fontSize: '24px', fontWeight: 'bold', color: '#3776ab'}}>10</div>
+    <div style={{fontSize: '12px', color: '#6b7280'}}>Matrices</div>
+  </div>
+</div>
+
+## Description
+
+Jones matrices for polarisers in x/y linear and l/r circular bases.
+
+Taken from Mark Zentile's thesis, 2015.
+
+**Basis conventions:**
+- x/y basis: x = (1,0), y = (0,1)
+- l/r basis: l = (1,0), r = (0,1)
+
+## Dependencies
+
+```python
+import numpy as np
+```
+
+## Available Matrices
+
+### Linear Polarisers
+
+| Matrix | Description | x/y Basis | l/r Basis |
+|--------|-------------|-----------|-----------|
+| `HorizPol` | Horizontal (x) polariser | [[1,0],[0,0]] | (1/2)[[1,1],[1,1]] |
+| `VertPol` | Vertical (y) polariser | [[0,0],[0,1]] | (1/2)[[1,-1],[-1,1]] |
+| `LPol_P45` | +45° linear polariser | (1/2)[[1,1],[1,1]] | (1/2)[[1,-i],[i,1]] |
+| `LPol_M45` | -45° linear polariser | (1/2)[[1,-1],[-1,1]] | (1/2)[[1,i],[-i,1]] |
+
+### Circular Polarisers
+
+| Matrix | Description | l/r Basis |
+|--------|-------------|-----------|
+| `CPol_L_lr` | Left circular polariser | [[1,0],[0,0]] |
+| `CPol_R_lr` | Right circular polariser | [[0,0],[0,1]] |
+
+## Source Code
+
+```python showLineNumbers
+import numpy as np
+
+# Horizontal polarisers (P_x)
+HorizPol_xy = np.matrix([[1,0],[0,0]])
+HorizPol_lr = 1./2 * np.matrix([[1,1],[1,1]])
+
+# Vertical polarisers (P_y)
+VertPol_xy = np.matrix([[0,0],[0,1]])
+VertPol_lr = 1./2 * np.matrix([[1,-1],[-1,1]])
+
+# Linear polarisers at plus 45 degrees wrt x-axis
+LPol_P45_xy = 1./2 * np.matrix([[1,1],[1,1]])
+LPol_P45_lr = 1./2 * np.matrix([[1,-1.j],[1.j,1]])
+
+# Linear polarisers at minus 45 degrees wrt x-axis
+LPol_M45_xy = 1./2 * np.matrix([[1,-1],[-1,1]])
+LPol_M45_lr = 1./2 * np.matrix([[1,1.j],[-1.j,1]])
+
+# Left Circular polariser (in circular basis only)
+CPol_L_lr = np.matrix([[1,0],[0,0]])
+CPol_R_lr = np.matrix([[0,0],[0,1]])
+```
+
+## Usage Example
+
+```python
+import numpy as np
+from JonesMatrices import HorizPol_xy, VertPol_xy
+
+# Input electric field (45° linear polarisation)
+E_in = np.matrix([[1/np.sqrt(2)], [1/np.sqrt(2)]])
+
+# Apply horizontal polariser
+E_out_x = HorizPol_xy * E_in
+print(f"After x-polariser: {E_out_x.T}")
+
+# Apply vertical polariser
+E_out_y = VertPol_xy * E_in
+print(f"After y-polariser: {E_out_y.T}")
+
+# Calculate transmitted intensities
+I_x = float((E_out_x.H * E_out_x).real)
+I_y = float((E_out_y.H * E_out_y).real)
+print(f"Ix = {I_x:.3f}, Iy = {I_y:.3f}")
+```
+
+## Jones Calculus
+
+The Jones vector describes the polarisation state of light:
+
+```
+E = | Ex |
+    | Ey |
+```
+
+Jones matrices transform polarisation states:
+
+```
+E_out = J · E_in
+```
+
+The intensity after passing through a polariser is:
+
+```
+I = E† · E = |Ex|² + |Ey|²
+```
+
+---
+
+[Back to Library Reference](./)

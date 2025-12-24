@@ -1,0 +1,176 @@
+---
+title: AtomConstants.py - Atomic Constants
+sidebar_label: AtomConstants.py
+sidebar_position: 3
+---
+
+# AtomConstants.py - Atomic Constants Module
+
+<div style={{display: 'flex', gap: '12px', flexWrap: 'wrap', marginBottom: '24px'}}>
+  <a href="/libs/AtomConstants.py" download="AtomConstants.py"
+    style={{padding: '10px 20px', backgroundColor: '#10b981', color: 'white', borderRadius: '6px', textDecoration: 'none', fontWeight: 'bold'}}>
+    Download .py
+  </a>
+</div>
+
+<div style={{display: 'flex', gap: '24px', marginBottom: '24px', flexWrap: 'wrap'}}>
+  <div style={{padding: '12px 16px', backgroundColor: '#f3f4f6', borderRadius: '8px'}}>
+    <div style={{fontSize: '24px', fontWeight: 'bold', color: '#3776ab'}}>284</div>
+    <div style={{fontSize: '12px', color: '#6b7280'}}>Lines of Code</div>
+  </div>
+  <div style={{padding: '12px 16px', backgroundColor: '#f3f4f6', borderRadius: '8px'}}>
+    <div style={{fontSize: '24px', fontWeight: 'bold', color: '#3776ab'}}>32</div>
+    <div style={{fontSize: '12px', color: '#6b7280'}}>Classes</div>
+  </div>
+</div>
+
+## Description
+
+Atom/transition related constants. Hyperfine constants are in units of MHz. Nuclear spin g-factors are those corresponding to the Bohr magneton.
+
+Called by `EigenSystem.py`
+
+## Dependencies
+
+```python
+from numpy import pi, sqrt
+from FundamentalConstants import *
+```
+
+## Atom Classes
+
+### `IdealAtom`
+Constants for an ideal atom with no hyperfine structure, and only electron spin.
+
+| Property | Value | Description |
+|----------|-------|-------------|
+| `I` | 0 | Nuclear spin |
+| `As` | 0 | Ground state hyperfine constant (MHz) |
+| `gI` | 0 | Nuclear spin g-factor |
+| `mass` | 85*amu | Atomic mass |
+
+### `Rb85`
+Constants relating to the rubidium-85 atom.
+
+| Property | Value | Description |
+|----------|-------|-------------|
+| `I` | 2.5 | Nuclear spin |
+| `As` | 1011.910813 | Ground state hyperfine constant (MHz) |
+| `gI` | -0.00029364 | Nuclear spin g-factor |
+| `mass` | 84.911789732*amu | Atomic mass |
+| `FS` | 7.123e6 | Fine-structure splitting (MHz) |
+
+### `Rb87`
+Constants relating to the rubidium-87 atom.
+
+| Property | Value | Description |
+|----------|-------|-------------|
+| `I` | 1.5 | Nuclear spin |
+| `As` | 3417.341305452145 | Ground state hyperfine constant (MHz) |
+| `gI` | -0.0009951414 | Nuclear spin g-factor |
+| `mass` | 86.909180520*amu | Atomic mass |
+| `FS` | 7.123e6 | Fine-structure splitting (MHz) |
+
+### `Cs`
+Constants relating to the caesium-133 atom.
+
+| Property | Value | Description |
+|----------|-------|-------------|
+| `I` | 3.5 | Nuclear spin |
+| `As` | 2298.1579425 | Ground state hyperfine constant (MHz) |
+| `gI` | -0.00039885395 | Nuclear spin g-factor |
+| `mass` | 132.905451931*amu | Atomic mass |
+
+### `K39`, `K40`, `K41`
+Constants for potassium isotopes.
+
+### `Na`
+Constants for sodium-23.
+
+## Transition Classes
+
+### `RbD1Transition`
+Constants relating to the rubidium D1 transition.
+
+| Property | Value | Description |
+|----------|-------|-------------|
+| `wavelength` | 794.978969380e-9 | Weighted linecentre (m) |
+| `wavevectorMagnitude` | 2π/wavelength | Wavevector magnitude |
+| `NatGamma` | 5.746 | Natural linewidth (MHz) |
+| `dipoleStrength` | (calculated) | Transition dipole |
+| `v0` | 377107407.299e6 | Linecentre frequency (Hz) |
+
+### `RbD2Transition`
+Constants relating to the rubidium D2 transition.
+
+| Property | Value | Description |
+|----------|-------|-------------|
+| `wavelength` | 780.2413272e-9 | Weighted linecentre (m) |
+| `NatGamma` | 6.065 | Natural linewidth (MHz) |
+| `v0` | 384230426.6e6 | Linecentre frequency (Hz) |
+
+### `CsD1Transition`, `CsD2Transition`
+Constants for caesium D-lines.
+
+### `KD1Transition`, `KD2Transition`
+Constants for potassium D-lines.
+
+### `NaD1Transition`, `NaD2Transition`
+Constants for sodium D-lines.
+
+## Isotope-Transition Classes
+
+These classes provide hyperfine coupling constants for specific isotope-transition combinations.
+
+### `Rb85_D1`, `Rb85_D2`
+| Property | D1 Value | D2 Value | Description |
+|----------|----------|----------|-------------|
+| `Ap` | 120.640 | 25.038 | Excited state A coefficient (MHz) |
+| `Bp` | 0.0 | 26.011 | Excited state B coefficient (MHz) |
+| `IsotopeShift` | 21.624 | 21.734 | Isotope shift (MHz) |
+
+### `Rb87_D1`, `Rb87_D2`
+| Property | D1 Value | D2 Value | Description |
+|----------|----------|----------|-------------|
+| `Ap` | 406.147 | 84.7185 | Excited state A coefficient (MHz) |
+| `Bp` | 0.0 | 12.4965 | Excited state B coefficient (MHz) |
+| `IsotopeShift` | -56.077 | -56.361 | Isotope shift (MHz) |
+
+Similar classes exist for `Cs_D1`, `Cs_D2`, `K39_D1`, `K39_D2`, `K40_D1`, `K40_D2`, `K41_D1`, `K41_D2`, `Na_D1`, `Na_D2`.
+
+## Transitions Dictionary
+
+```python
+transitions = {
+    'RbD1': RbD1Transition,
+    'RbD2': RbD2Transition,
+    'CsD1': CsD1Transition,
+    'CsD2': CsD2Transition,
+    'KD1': KD1Transition,
+    'KD2': KD2Transition,
+    'NaD1': NaD1Transition,
+    'NaD2': NaD2Transition,
+    'IdealD1': IdealD1Transition
+}
+```
+
+## Usage Example
+
+```python
+from AtomConstants import Rb87, RbD2Transition, Rb87_D2
+
+# Get Rb-87 properties
+print(f"Rb-87 nuclear spin: {Rb87.I}")
+print(f"Rb-87 mass: {Rb87.mass} kg")
+
+# Get D2 transition properties
+print(f"D2 wavelength: {RbD2Transition.wavelength * 1e9:.3f} nm")
+print(f"D2 linewidth: {RbD2Transition.NatGamma} MHz")
+
+# Get isotope-specific hyperfine constants
+print(f"Rb-87 D2 Ap: {Rb87_D2.Ap} MHz")
+```
+
+---
+
+[Back to Library Reference](./)

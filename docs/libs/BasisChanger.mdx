@@ -1,0 +1,147 @@
+---
+title: BasisChanger.py - Basis Transformations
+sidebar_label: BasisChanger.py
+sidebar_position: 8
+---
+
+# BasisChanger.py - Electric Field Basis Transformations
+
+<div style={{display: 'flex', gap: '12px', flexWrap: 'wrap', marginBottom: '24px'}}>
+  <a href="/libs/BasisChanger.py" download="BasisChanger.py"
+    style={{padding: '10px 20px', backgroundColor: '#10b981', color: 'white', borderRadius: '6px', textDecoration: 'none', fontWeight: 'bold'}}>
+    Download .py
+  </a>
+</div>
+
+<div style={{display: 'flex', gap: '24px', marginBottom: '24px', flexWrap: 'wrap'}}>
+  <div style={{padding: '12px 16px', backgroundColor: '#f3f4f6', borderRadius: '8px'}}>
+    <div style={{fontSize: '24px', fontWeight: 'bold', color: '#3776ab'}}>62</div>
+    <div style={{fontSize: '12px', color: '#6b7280'}}>Lines of Code</div>
+  </div>
+  <div style={{padding: '12px 16px', backgroundColor: '#f3f4f6', borderRadius: '8px'}}>
+    <div style={{fontSize: '24px', fontWeight: 'bold', color: '#3776ab'}}>2</div>
+    <div style={{fontSize: '12px', color: '#6b7280'}}>Functions</div>
+  </div>
+</div>
+
+## Description
+
+Change electric field basis between xyz and +/-/z bases. This module provides methods to convert in both directions.
+
+Following sign convention in 'Optically Polarised Atoms' by Auzinsh, Budker and Rochester, eq 6.32 (OUP, 2010).
+
+## Dependencies
+
+```python
+import numpy as np
+```
+
+## Functions
+
+### `xyz_to_lrz(E_in)`
+
+Convert from linear (Cartesian) to circular bases.
+
+**Transformation:**
+```
+E_L = (1/√2)(E_x - iE_y)
+E_R = (1/√2)(E_x + iE_y)
+E_z = E_z
+```
+
+**Arguments:**
+- `E_in` - Electric field array [Ex, Ey, Ez]
+
+**Returns:**
+- `E_out` - Electric field in circular basis [E_L, E_R, E_z]
+
+### `lrz_to_xyz(E_in)`
+
+Convert from circular to linear (Cartesian) bases.
+
+**Transformation:**
+```
+E_x = (1/√2)(E_L + E_R)
+E_y = (i/√2)(E_L - E_R)
+E_z = E_z
+```
+
+**Arguments:**
+- `E_in` - Electric field array [E_L, E_R, E_z]
+
+**Returns:**
+- `E_out` - Electric field in Cartesian basis [Ex, Ey, Ez]
+
+## Source Code
+
+```python showLineNumbers
+import numpy as np
+
+def xyz_to_lrz(E_in):
+    """ Convert from linear to circular bases """
+    E_out = np.zeros_like(E_in, dtype='complex')
+
+    # z-component doesn't change
+    E_out[2] = E_in[2]
+
+    # L = 1/sqrt(2) * (x - iy)
+    # R = 1/sqrt(2) * (x + iy)
+    E_out[0] = 1./np.sqrt(2) * (E_in[0] - 1.j*E_in[1])
+    E_out[1] = 1./np.sqrt(2) * (E_in[0] + 1.j*E_in[1])
+
+    return E_out
+
+def lrz_to_xyz(E_in):
+    """ Convert from circular to linear bases """
+    E_out = np.zeros_like(E_in, dtype='complex')
+
+    # z-component doesn't change
+    E_out[2] = E_in[2]
+
+    # x = 1/sqrt(2) * [L + R]
+    # y = i/sqrt(2) * [L - R]
+    E_out[0] = 1./np.sqrt(2) * (E_in[0] + E_in[1])
+    E_out[1] = 1.j/np.sqrt(2) * (E_in[0] - E_in[1])
+
+    return E_out
+```
+
+## Usage Example
+
+```python
+import numpy as np
+from BasisChanger import xyz_to_lrz, lrz_to_xyz
+
+# Linear polarisation along x-axis
+E_linear_x = np.array([1, 0, 0], dtype='complex')
+E_circular = xyz_to_lrz(E_linear_x)
+print(f"x-polarised in circular basis: {E_circular}")
+# Output: [0.707+0j, 0.707+0j, 0+0j] (equal L and R components)
+
+# Right-circular polarisation
+E_right = np.array([0, 1, 0], dtype='complex')
+E_cart = lrz_to_xyz(E_right)
+print(f"RCP in Cartesian basis: {E_cart}")
+# Output: [0.707+0j, 0-0.707j, 0+0j] (Ex and Ey with π/2 phase shift)
+
+# Verify round-trip conversion
+E_original = np.array([0.6, 0.8j, 0], dtype='complex')
+E_recovered = lrz_to_xyz(xyz_to_lrz(E_original))
+print(f"Round-trip error: {np.max(np.abs(E_original - E_recovered))}")
+```
+
+## Physics
+
+### Circular Polarisation States
+
+| State | xyz Representation | lrz Representation |
+|-------|-------------------|-------------------|
+| x-polarised | [1, 0, 0] | [1/√2, 1/√2, 0] |
+| y-polarised | [0, 1, 0] | [-i/√2, i/√2, 0] |
+| +45° polarised | [1/√2, 1/√2, 0] | [(1-i)/2, (1+i)/2, 0] |
+| LCP | [1/√2, -i/√2, 0] | [1, 0, 0] |
+| RCP | [1/√2, i/√2, 0] | [0, 1, 0] |
+
+---
+
+[Back to Library Reference](./)

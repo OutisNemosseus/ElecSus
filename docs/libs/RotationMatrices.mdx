@@ -1,0 +1,159 @@
+---
+title: RotationMatrices.py - Rotation Matrices
+sidebar_label: RotationMatrices.py
+sidebar_position: 9
+---
+
+# RotationMatrices.py - 3D Rotation Matrices
+
+<div style={{display: 'flex', gap: '12px', flexWrap: 'wrap', marginBottom: '24px'}}>
+  <a href="/libs/RotationMatrices.py" download="RotationMatrices.py"
+    style={{padding: '10px 20px', backgroundColor: '#10b981', color: 'white', borderRadius: '6px', textDecoration: 'none', fontWeight: 'bold'}}>
+    Download .py
+  </a>
+</div>
+
+<div style={{display: 'flex', gap: '24px', marginBottom: '24px', flexWrap: 'wrap'}}>
+  <div style={{padding: '12px 16px', backgroundColor: '#f3f4f6', borderRadius: '8px'}}>
+    <div style={{fontSize: '24px', fontWeight: 'bold', color: '#3776ab'}}>180</div>
+    <div style={{fontSize: '12px', color: '#6b7280'}}>Lines of Code</div>
+  </div>
+  <div style={{padding: '12px 16px', backgroundColor: '#f3f4f6', borderRadius: '8px'}}>
+    <div style={{fontSize: '24px', fontWeight: 'bold', color: '#3776ab'}}>4</div>
+    <div style={{fontSize: '12px', color: '#6b7280'}}>Functions</div>
+  </div>
+</div>
+
+## Description
+
+Rotation matrices for rotating Cartesian coordinate systems around a particular axis. Used for transforming between lab frame and magnetic field frame.
+
+## Dependencies
+
+```python
+import numpy as np
+from numpy import cos, sin
+```
+
+## Functions
+
+### `rotate_forward(input_vec, phi, theta, test=False)`
+
+Rotate coordinate system so that B-field points along z' direction.
+
+With respect to the lab frame (x,y,z), the magnetic field vector is:
+```
+B = ( cos(φ)sin(θ), sin(φ), cos(φ)cos(θ) )
+```
+
+This function applies two transformations:
+1. Rotation around x-axis (to bring B into xz-plane)
+2. Rotation around y-axis (to align B with z-axis)
+
+**Arguments:**
+- `input_vec` - Input vector [x, y, z] or array of vectors [[x1,y1,z1], ...]
+- `phi` - Azimuthal angle (radians)
+- `theta` - Polar angle (radians)
+- `test` - If True, also return transformed B-field
+
+**Returns:**
+- Rotated vector(s)
+- (if test=True) Also returns rotated B-field
+
+### `rotate_back(input_vec, phi, theta)`
+
+Reverse the rotation that `rotate_forward()` does.
+
+**Arguments:**
+- `input_vec` - Input vector in rotated frame
+- `phi` - Azimuthal angle (radians)
+- `theta` - Polar angle (radians)
+
+**Returns:**
+- Vector in original lab frame
+
+### `rotate_around_z(input_vec, phi)`
+
+Rotate 3D vector around the z-axis, counter-clockwise.
+
+**Arguments:**
+- `input_vec` - Input vector [x, y, z]
+- `phi` - Rotation angle (radians)
+
+**Returns:**
+- Rotated vector
+
+### `rotate_around_z2(input_vec, phi)`
+
+Rotate stacked array of 3D vectors around the z-axis.
+
+Extended version of `rotate_around_z` that operates on arrays of vectors efficiently.
+
+**Arguments:**
+- `input_vec` - Array of vectors, shape (N, 3)
+- `phi` - Rotation angle (radians)
+
+**Returns:**
+- Array of rotated vectors, shape (N, 3)
+
+## Rotation Matrices
+
+### Rotation around x-axis (R_x):
+```
+R_x(φ) = | 1    0       0     |
+         | 0    cos(φ) -sin(φ)|
+         | 0    sin(φ)  cos(φ)|
+```
+
+### Rotation around y-axis (R_y):
+```
+R_y(θ) = | cos(θ)  0  sin(θ)|
+         | 0       1  0     |
+         |-sin(θ)  0  cos(θ)|
+```
+
+### Rotation around z-axis (R_z):
+```
+R_z(φ) = | cos(φ) -sin(φ)  0|
+         | sin(φ)  cos(φ)  0|
+         | 0       0       1|
+```
+
+## Usage Example
+
+```python
+import numpy as np
+from RotationMatrices import rotate_forward, rotate_back, rotate_around_z
+
+# B-field at 45 degrees to z-axis, in xz-plane
+theta = np.pi/4  # 45 degrees
+phi = 0
+
+# Electric field polarised along x
+E_lab = np.array([1, 0, 0])
+
+# Transform to B-field frame
+E_Bframe = rotate_forward(E_lab, phi, theta)
+print(f"E in B-field frame: {E_Bframe.flatten()}")
+
+# Transform back
+E_recovered = rotate_back(E_Bframe, phi, theta)
+print(f"E recovered: {E_recovered.flatten()}")
+
+# Simple rotation around z
+E_rotated = rotate_around_z([1, 0, 0], np.pi/4)  # 45 degree rotation
+print(f"After 45° z-rotation: {E_rotated.flatten()}")
+```
+
+## Application in ElecSus
+
+In `spectra.py`, these rotations are used to:
+1. Transform the input electric field to the B-field coordinate system
+2. Calculate propagation in the aligned frame
+3. Transform the output field back to the lab frame
+
+This allows calculation of spectra for arbitrary B-field orientations.
+
+---
+
+[Back to Library Reference](./)

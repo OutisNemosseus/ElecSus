@@ -1,0 +1,145 @@
+---
+title: MLFittingRoutine.py - Marquardt-Levenberg Fitting
+sidebar_label: MLFittingRoutine.py
+sidebar_position: 15
+---
+
+# MLFittingRoutine.py - Marquardt-Levenberg Fitting
+
+<div style={{display: 'flex', gap: '12px', flexWrap: 'wrap', marginBottom: '24px'}}>
+  <a href="/libs/MLFittingRoutine.py" download="MLFittingRoutine.py"
+    style={{padding: '10px 20px', backgroundColor: '#10b981', color: 'white', borderRadius: '6px', textDecoration: 'none', fontWeight: 'bold'}}>
+    Download .py
+  </a>
+</div>
+
+<div style={{display: 'flex', gap: '24px', marginBottom: '24px', flexWrap: 'wrap'}}>
+  <div style={{padding: '12px 16px', backgroundColor: '#f3f4f6', borderRadius: '8px'}}>
+    <div style={{fontSize: '24px', fontWeight: 'bold', color: '#3776ab'}}>151</div>
+    <div style={{fontSize: '12px', color: '#6b7280'}}>Lines of Code</div>
+  </div>
+  <div style={{padding: '12px 16px', backgroundColor: '#f3f4f6', borderRadius: '8px'}}>
+    <div style={{fontSize: '24px', fontWeight: 'bold', color: '#3776ab'}}>2</div>
+    <div style={{fontSize: '12px', color: '#6b7280'}}>Functions</div>
+  </div>
+</div>
+
+## Description
+
+Marquardt-Levenberg (Levenberg-Marquardt) fit module. Uses the lmfit module for flexible parameter fitting with bounds.
+
+Differential evolution requires lmfit version >= 0.9.3.
+
+## Dependencies
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+import lmfit as lm
+from spectra import get_spectra
+```
+
+## Functions
+
+### `fit_function(x, E_x, E_y, E_phase, T, lcell, Bfield, Btheta, Bphi, GammaBuf, shift, ...)`
+
+Fit function used by lmfit. Wrapper for `get_spectra` with explicit arguments.
+
+**Arguments:**
+- `x` - Detuning array (MHz)
+- `E_x`, `E_y`, `E_phase` - Electric field components
+- `T` - Temperature (°C)
+- `lcell` - Cell length (m)
+- `Bfield` - Magnetic field (Gauss)
+- `Btheta`, `Bphi` - B-field angles (radians)
+- `GammaBuf` - Buffer gas broadening (MHz)
+- `shift` - Frequency shift (MHz)
+- `DoppTemp` - Doppler temperature (°C)
+- `rb85frac`, `K40frac`, `K41frac` - Isotope fractions (%)
+- `Elem`, `Dline` - Element and transition
+- `Constrain` - Constrain Doppler temp
+- `output` - Output type ('S0', 'S1', etc.)
+
+**Returns:**
+- Calculated spectrum array
+
+### `ML_fit(data, E_in, p_dict, p_dict_bools, data_type='S0', p_dict_bounds=None, method='leastsq', verbose=False)`
+
+Main fitting method.
+
+**Arguments:**
+- `data` - [x, y] arrays of experimental data
+- `E_in` - Input electric field [Ex, [Ey_mag, Ey_phase]]
+- `p_dict` - Parameter dictionary with initial values
+- `p_dict_bools` - Dict specifying which parameters to vary
+- `data_type` - Output type to fit ('S0', 'S1', etc.)
+- `p_dict_bounds` - Dict with [min, max] bounds for each parameter
+- `method` - Fitting algorithm (see below)
+- `verbose` - Print debug info
+
+**Returns:**
+- `best_values` - Dictionary of best-fit parameter values
+- `result` - lmfit result object
+
+**Available Methods:**
+| Method | Description |
+|--------|-------------|
+| `leastsq` | Levenberg-Marquardt (default) |
+| `least_squares` | Trust Region Reflective |
+| `differential_evolution` | Global optimisation |
+| `nelder` | Nelder-Mead simplex |
+| `powell` | Powell's method |
+| `cobyla` | COBYLA |
+
+## Usage Example
+
+```python
+import numpy as np
+from MLFittingRoutine import ML_fit
+from spectra import get_spectra
+
+# Generate synthetic data
+x = np.linspace(-5000, 5000, 500)
+E_in = np.array([1, 0, 0])
+p_dict_true = {'Elem': 'Rb', 'Dline': 'D2', 'T': 50,
+               'lcell': 2e-3, 'Bfield': 200, 'Btheta': 0,
+               'Bphi': 0, 'GammaBuf': 0, 'shift': 0}
+
+[y_true] = get_spectra(x, E_in, p_dict_true, outputs=['S0'])
+y_noisy = y_true.real + np.random.randn(len(x)) * 0.01
+data = [x, y_noisy]
+
+# Set up fit
+E_in_fit = [1.0, [0.0, 0.0]]  # [Ex, [Ey, phase]]
+p_dict = {'Elem': 'Rb', 'Dline': 'D2', 'T': 40,  # Initial guesses
+          'lcell': 2e-3, 'Bfield': 150, 'Btheta': 0,
+          'Bphi': 0, 'GammaBuf': 0, 'shift': 0}
+
+# Specify which parameters to fit
+p_dict_bools = {'T': True, 'Bfield': True}
+
+# Optional bounds
+p_dict_bounds = {'T': [20, 100], 'Bfield': [0, 500]}
+
+# Run fit
+best_params, result = ML_fit(data, E_in_fit, p_dict, p_dict_bools,
+                              data_type='S0', p_dict_bounds=p_dict_bounds)
+
+print(result.fit_report())
+print(f"Best T: {best_params['T']:.1f} °C")
+print(f"Best Bfield: {best_params['Bfield']:.1f} G")
+```
+
+## lmfit Result Object
+
+The returned `result` object contains:
+- `result.best_fit` - Best fit y-values
+- `result.best_values` - Dict of best parameters
+- `result.fit_report()` - Text summary
+- `result.chisqr` - Chi-squared value
+- `result.redchi` - Reduced chi-squared
+- `result.params` - Parameter objects with uncertainties
+
+---
+
+[Back to Library Reference](./)
