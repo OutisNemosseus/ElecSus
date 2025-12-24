@@ -66,15 +66,18 @@ class InboxProcessor {
   }
 
   /**
-   * Get output file path
+   * Get output file path - includes extension type to avoid overwrites
    * @param {string} inputPath - Input file path
    * @param {string} outputDir - Output directory
    * @returns {string} Output MDX file path
    */
   getOutputPath(inputPath, outputDir) {
+    const ext = path.extname(inputPath).toLowerCase().replace('.', '');
     const basename = path.basename(inputPath, path.extname(inputPath));
     const safeName = basename.replace(/[^a-zA-Z0-9_-]/g, '_');
-    return path.join(outputDir, `${safeName}.mdx`);
+    // Add extension suffix for PDF/TEX to avoid overwrites
+    const suffix = ['pdf', 'tex'].includes(ext) ? `_${ext}` : '';
+    return path.join(outputDir, `${safeName}${suffix}.mdx`);
   }
 
   /**
@@ -303,45 +306,47 @@ ${content}
     const stats = fs.statSync(filePath);
     const sizeKB = Math.round(stats.size / 1024);
 
-    const frontmatter = this.generateFrontmatter(`${title} - PDF Document`, {
-      sidebarLabel: filename,
+    const frontmatter = this.generateFrontmatter(`${title} - PDF`, {
+      sidebarLabel: `${title} (PDF)`,
       tags: ['pdf', 'document']
     });
 
     return `${frontmatter}
 
-# ${title}
+# ${title} - PDF Document
 
 <div style={{display: 'flex', gap: '12px', flexWrap: 'wrap', marginBottom: '24px'}}>
   <a href="${staticPath}" download="${filename}"
     style={{padding: '10px 20px', backgroundColor: '#10b981', color: 'white', borderRadius: '6px', textDecoration: 'none', fontWeight: 'bold'}}>
-    Download PDF
+    📥 Download PDF
   </a>
-  <a href="${staticPath}" target="_blank"
+  <a href="${staticPath}" target="_blank" rel="noopener noreferrer"
     style={{padding: '10px 20px', backgroundColor: '#dc2626', color: 'white', borderRadius: '6px', textDecoration: 'none', fontWeight: 'bold'}}>
-    Open PDF
+    🔗 Open in New Tab
   </a>
 </div>
 
-<div style={{display: 'flex', gap: '24px', marginBottom: '24px', flexWrap: 'wrap'}}>
-  <div style={{padding: '12px 16px', backgroundColor: '#f3f4f6', borderRadius: '8px'}}>
-    <div style={{fontSize: '24px', fontWeight: 'bold', color: '#dc2626'}}>${sizeKB}</div>
-    <div style={{fontSize: '12px', color: '#6b7280'}}>KB</div>
-  </div>
+<div style={{padding: '12px 16px', backgroundColor: '#f3f4f6', borderRadius: '8px', display: 'inline-block', marginBottom: '24px'}}>
+  <div style={{fontSize: '14px', color: '#6b7280'}}>File Size: <strong>${sizeKB} KB</strong></div>
 </div>
 
-## Preview
+## PDF Preview
+
+:::tip
+If the preview doesn't load, use the **Open in New Tab** button above.
+:::
 
 <iframe
   src="${staticPath}"
   width="100%"
-  height="600px"
-  style={{border: '1px solid #e5e7eb', borderRadius: '8px'}}
+  height="900px"
+  style={{
+    border: '2px solid #e5e7eb',
+    borderRadius: '8px',
+    boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+  }}
+  title="${title} PDF"
 />
-
-:::tip
-If the preview doesn't load, use the "Open PDF" button above to view in a new tab.
-:::
 `;
   }
 
