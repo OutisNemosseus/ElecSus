@@ -10,7 +10,7 @@
 
 const fs = require('fs');
 const path = require('path');
-const { Logger } = require('../utils/logger');
+const { createLogger } = require('../utils/logger');
 const { getFileTypeConfig } = require('../config/fileTypes');
 
 /**
@@ -22,7 +22,7 @@ class InboxProcessor {
    */
   constructor(config) {
     this.config = config;
-    this.logger = new Logger('InboxProcessor');
+    this.logger = createLogger();
 
     // File type handlers
     this.handlers = {

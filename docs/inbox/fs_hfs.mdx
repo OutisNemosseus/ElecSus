@@ -1,0 +1,338 @@
+---
+title: "\textbf{fs\_hfs.py - LaTeX Document"
+sidebar_label: "fs_hfs.tex"
+sidebarLabel: "fs_hfs.tex"
+tags: ["latex", "document"]
+---
+
+# \textbf{fs\_hfs.py
+
+<div style={{display: 'flex', gap: '12px', flexWrap: 'wrap', marginBottom: '24px'}}>
+  <a href="/static/inbox/fs_hfs.tex" download="fs_hfs.tex"
+    style={{padding: '10px 20px', backgroundColor: '#10b981', color: 'white', borderRadius: '6px', textDecoration: 'none', fontWeight: 'bold'}}>
+    Download .tex
+  </a>
+  <a href="/static/inbox/fs_hfs.tex" target="_blank"
+    style={{padding: '10px 20px', backgroundColor: '#008080', color: 'white', borderRadius: '6px', textDecoration: 'none', fontWeight: 'bold'}}>
+    View Raw
+  </a>
+</div>
+
+<div style={{display: 'flex', gap: '24px', marginBottom: '24px', flexWrap: 'wrap'}}>
+  <div style={{padding: '12px 16px', backgroundColor: '#f3f4f6', borderRadius: '8px'}}>
+    <div style={{fontSize: '24px', fontWeight: 'bold', color: '#008080'}}>283</div>
+    <div style={{fontSize: '12px', color: '#6b7280'}}>Lines</div>
+  </div>
+  <div style={{padding: '12px 16px', backgroundColor: '#f3f4f6', borderRadius: '8px'}}>
+    <div style={{fontSize: '24px', fontWeight: 'bold', color: '#008080'}}>5</div>
+    <div style={{fontSize: '12px', color: '#6b7280'}}>Sections</div>
+  </div>
+</div>
+
+**Author:** ElecSus Library Documentation
+
+
+
+## Abstract
+
+This document provides comprehensive documentation for \texttt{fs\_hfs.py}, which calculates the fine structure ($\vec{L} \cdot \vec{S}$) and hyperfine structure ($\vec{I} \cdot \vec{J}$) interaction matrices. These matrices are essential for computing atomic energy levels and transition frequencies in alkali atoms.
+
+
+
+## Sections
+
+1. Theoretical Foundation
+2. Basis State Formalism
+3. Line-by-Line Code Analysis
+4. Physical Examples
+5. Summary
+
+
+
+## Source Code
+
+```latex title="fs_hfs.tex" showLineNumbers
+\documentclass[11pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{physics}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{geometry}
+\usepackage{hyperref}
+\usepackage{booktabs}
+
+\geometry{margin=1in}
+
+\lstset{
+    language=Python,
+    basicstyle=\ttfamily\small,
+    keywordstyle=\color{blue},
+    commentstyle=\color{green!60!black},
+    stringstyle=\color{orange},
+    numbers=left,
+    numberstyle=\tiny\color{gray},
+    breaklines=true,
+    frame=single,
+    backgroundcolor=\color{gray!10}
+}
+
+\newtheorem{axiom}{Axiom}
+\newtheorem{definition}{Definition}
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}{Lemma}
+\newtheorem{corollary}{Corollary}
+
+\title{\textbf{fs\_hfs.py} \\ Fine and Hyperfine Structure Matrices \\ \large Energy Splitting in Alkali Atoms}
+\author{ElecSus Library Documentation}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+This document provides comprehensive documentation for \texttt{fs\_hfs.py}, which calculates the fine structure ($\vec{L} \cdot \vec{S}$) and hyperfine structure ($\vec{I} \cdot \vec{J}$) interaction matrices. These matrices are essential for computing atomic energy levels and transition frequencies in alkali atoms.
+\end{abstract}
+
+\tableofcontents
+\newpage
+
+%==============================================================================
+\section{Theoretical Foundation}
+%==============================================================================
+
+\subsection{Fine Structure Interaction}
+
+\begin{axiom}[Spin-Orbit Coupling]
+The fine structure arises from the interaction between the electron's orbital angular momentum and its spin:
+\begin{equation}
+H_{FS} = \xi(r) \vec{L} \cdot \vec{S}
+\end{equation}
+where $\xi(r)$ is the spin-orbit coupling function.
+\end{axiom}
+
+\begin{theorem}[Fine Structure Energy]
+Using $\vec{J} = \vec{L} + \vec{S}$:
+\begin{equation}
+\vec{L} \cdot \vec{S} = \frac{1}{2}(J^2 - L^2 - S^2) = \frac{1}{2}[J(J+1) - L(L+1) - S(S+1)]\hbar^2
+\end{equation}
+\end{theorem}
+
+\begin{definition}[Total Electronic Angular Momentum]
+For alkali atoms with one valence electron:
+\begin{equation}
+\vec{J} = \vec{L} + \vec{S}
+\end{equation}
+For S-states ($L=0$): $J = S = 1/2$. For P-states ($L=1$): $J = 1/2$ or $3/2$.
+\end{definition}
+
+\subsection{Hyperfine Structure Interaction}
+
+\begin{axiom}[Nuclear Magnetic Dipole Interaction]
+The magnetic dipole hyperfine interaction couples nuclear and electronic angular momenta:
+\begin{equation}
+H_{HFS}^{(1)} = A_{HFS} \vec{I} \cdot \vec{J}
+\end{equation}
+where $A_{HFS}$ is the magnetic dipole hyperfine constant.
+\end{axiom}
+
+\begin{theorem}[Hyperfine Energy Shift]
+Using $\vec{F} = \vec{I} + \vec{J}$:
+\begin{equation}
+E_{HFS}^{(1)} = \frac{A_{HFS}}{2}[F(F+1) - I(I+1) - J(J+1)]
+\end{equation}
+\end{theorem}
+
+\begin{definition}[Electric Quadrupole Interaction]
+For $I \geq 1$ and $J \geq 1$, the nuclear electric quadrupole interaction:
+\begin{equation}
+H_{HFS}^{(2)} = B_{HFS} \frac{3(\vec{I} \cdot \vec{J})^2 + \frac{3}{2}(\vec{I} \cdot \vec{J}) - I(I+1)J(J+1)}{2I(2I-1)J(2J-1)}
+\end{equation}
+\end{definition}
+
+%==============================================================================
+\section{Basis State Formalism}
+%==============================================================================
+
+\subsection{Uncoupled Basis}
+
+\begin{definition}[Product Basis]
+The uncoupled basis states are:
+\begin{equation}
+|L, m_L\rangle \otimes |S, m_S\rangle \otimes |I, m_I\rangle
+\end{equation}
+with dimensions $(2L+1)(2S+1)(2I+1)$.
+\end{definition}
+
+\begin{theorem}[Kronecker Product Structure]
+Operators on the full Hilbert space are constructed via tensor products:
+\begin{equation}
+J_x = L_x \otimes \mathbb{1}_S \otimes \mathbb{1}_I + \mathbb{1}_L \otimes S_x \otimes \mathbb{1}_I
+\end{equation}
+\end{theorem}
+
+%==============================================================================
+\section{Line-by-Line Code Analysis}
+%==============================================================================
+
+\subsection{Module Imports}
+
+\begin{lstlisting}
+from numpy import identity,dot
+from scipy.linalg import kron
+from ang_mom import jx,jy,jz
+\end{lstlisting}
+\textit{Import identity matrix, matrix multiplication, Kronecker product, and angular momentum matrices.}
+
+\subsection{Fine Structure Function: Hfs(L,S,I)}
+
+\begin{lstlisting}
+def Hfs(L,S,I):
+    """Provides the L dot S matrix (fine structure)"""
+    gS=int(2*S+1) #number of mS values
+    Sx=jx(S)
+    Sy=jy(S)
+    Sz=jz(S)
+    Si=identity(gS)
+\end{lstlisting}
+\textit{Create spin matrices and identity in the $(2S+1)$-dimensional spin space.}
+
+\vspace{0.5em}
+\begin{lstlisting}
+    gL=int(2*L+1)
+    Lx=jx(L)
+    Ly=jy(L)
+    Lz=jz(L)
+    Li=identity(gL)
+\end{lstlisting}
+\textit{Create orbital angular momentum matrices in $(2L+1)$-dimensional space.}
+
+\vspace{0.5em}
+\begin{lstlisting}
+    gJ=gL*gS
+    Jx=kron(Lx,Si)+kron(Li,Sx)
+    Jy=kron(Ly,Si)+kron(Li,Sy)
+    Jz=kron(Lz,Si)+kron(Li,Sz)
+    J2=dot(Jx,Jx)+dot(Jy,Jy)+dot(Jz,Jz)
+\end{lstlisting}
+\begin{equation}
+\vec{J} = \vec{L} \otimes \mathbb{1}_S + \mathbb{1}_L \otimes \vec{S}
+\end{equation}
+\begin{equation}
+J^2 = J_x^2 + J_y^2 + J_z^2
+\end{equation}
+\textit{Construct total electronic angular momentum in the product space.}
+
+\vspace{0.5em}
+\begin{lstlisting}
+    gI=int(2*I+1)
+    Ii=identity(gI)
+    gF=gJ*gI
+    Fi=identity(gF)
+    Hfs=0.5*(kron(J2,Ii)-L*(L+1)*Fi-S*(S+1)*Fi)
+    return Hfs
+\end{lstlisting}
+\begin{equation}
+H_{FS} = \frac{1}{2}(J^2 \otimes \mathbb{1}_I - L(L+1)\mathbb{1} - S(S+1)\mathbb{1})
+\end{equation}
+\textit{Compute $\vec{L} \cdot \vec{S}$ using the identity $\vec{L} \cdot \vec{S} = \frac{1}{2}(J^2 - L^2 - S^2)$, extended to include nuclear spin space.}
+
+\subsection{Hyperfine Structure Function: Hhfs(L,S,I)}
+
+\begin{lstlisting}
+def Hhfs(L,S,I):
+    """Provides the I dot J matrix (hyperfine structure interaction)"""
+\end{lstlisting}
+\textit{Calculate the magnetic dipole hyperfine matrix $\vec{I} \cdot \vec{J}$.}
+
+\vspace{0.5em}
+\begin{lstlisting}
+    # [Similar construction of L, S matrices...]
+    
+    Fx=kron(Jx,Ii)+kron(Ji,Ix)
+    Fy=kron(Jy,Ii)+kron(Ji,Iy)
+    Fz=kron(Jz,Ii)+kron(Ji,Iz)
+    Fi=identity(gF)
+    F2=dot(Fx,Fx)+dot(Fy,Fy)+dot(Fz,Fz)
+    Hhfs=0.5*(F2-I*(I+1)*Fi-kron(J2,Ii))
+    return Hhfs
+\end{lstlisting}
+\begin{equation}
+\vec{F} = \vec{J} \otimes \mathbb{1}_I + \mathbb{1}_J \otimes \vec{I}
+\end{equation}
+\begin{equation}
+H_{HFS} = \frac{1}{2}(F^2 - I(I+1)\mathbb{1} - J^2 \otimes \mathbb{1}_I) = \vec{I} \cdot \vec{J}
+\end{equation}
+\textit{Use the identity $\vec{I} \cdot \vec{J} = \frac{1}{2}(F^2 - I^2 - J^2)$.}
+
+\subsection{Electric Quadrupole Function: Bbhfs(L,S,I)}
+
+\begin{lstlisting}
+def Bbhfs(L,S,I):
+    """Calculates electric quadrupole matrix."""
+    # [Angular momentum construction...]
+    
+    IdotJ=kron(Jx,Ix)+kron(Jy,Iy)+kron(Jz,Iz)
+    IdotJ2=dot(IdotJ,IdotJ)
+\end{lstlisting}
+\begin{equation}
+(\vec{I} \cdot \vec{J})^2 = (I_x J_x + I_y J_y + I_z J_z)^2
+\end{equation}
+\textit{Square of the dot product, needed for quadrupole interaction.}
+
+\vspace{0.5em}
+\begin{lstlisting}
+    if I != 0:
+        Bbhfs=1./(6*I*(2*I-1))*(3*IdotJ2+3./2*IdotJ-I*(I+1)*15./4*Fi)
+    else:
+        Bbhfs = 0
+    return Bbhfs
+\end{lstlisting}
+\begin{equation}
+H_Q = \frac{1}{6I(2I-1)}\left[3(\vec{I} \cdot \vec{J})^2 + \frac{3}{2}(\vec{I} \cdot \vec{J}) - \frac{15}{4}I(I+1)\mathbb{1}\right]
+\end{equation}
+\textit{Electric quadrupole term. Returns zero for $I = 0$ (no nuclear quadrupole moment).}
+
+%==============================================================================
+\section{Physical Examples}
+%==============================================================================
+
+\subsection{Rubidium-87 Ground State}
+
+For $^{87}$Rb ground state ($5S_{1/2}$): $L=0$, $S=1/2$, $I=3/2$, $J=1/2$.
+
+Hyperfine levels: $F = 1, 2$ with splitting:
+\begin{equation}
+\Delta E_{HFS} = A_{HFS}(F=2) - A_{HFS}(F=1) = A_{HFS} \cdot \frac{3}{2} \cdot 2 = 3A_{HFS}
+\end{equation}
+
+\subsection{Cesium D2 Line}
+
+For $^{133}$Cs $6P_{3/2}$: $L=1$, $S=1/2$, $I=7/2$, $J=3/2$.
+
+The quadrupole interaction ($B_{HFS} \neq 0$) causes additional level shifts.
+
+%==============================================================================
+\section{Summary}
+%==============================================================================
+
+The \texttt{fs\_hfs.py} module provides three essential functions:
+
+\begin{enumerate}
+\item \texttt{Hfs(L,S,I)}: Fine structure matrix $\vec{L} \cdot \vec{S}$
+\item \texttt{Hhfs(L,S,I)}: Magnetic dipole hyperfine matrix $\vec{I} \cdot \vec{J}$
+\item \texttt{Bbhfs(L,S,I)}: Electric quadrupole hyperfine matrix
+\end{enumerate}
+
+Key features:
+\begin{itemize}
+\item Works in the uncoupled $|m_L, m_S, m_I\rangle$ basis
+\item Uses Kronecker products for tensor space construction
+\item Called by \texttt{EigenSystem.py} to build the full atomic Hamiltonian
+\item Matrix dimensions: $(2L+1)(2S+1)(2I+1) \times (2L+1)(2S+1)(2I+1)$
+\end{itemize}
+
+\end{document}
+
+```

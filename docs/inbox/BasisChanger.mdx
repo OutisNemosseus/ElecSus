@@ -1,0 +1,318 @@
+---
+title: "\textbf{BasisChanger.py - LaTeX Document"
+sidebar_label: "BasisChanger.tex"
+sidebarLabel: "BasisChanger.tex"
+tags: ["latex", "document"]
+---
+
+# \textbf{BasisChanger.py
+
+<div style={{display: 'flex', gap: '12px', flexWrap: 'wrap', marginBottom: '24px'}}>
+  <a href="/static/inbox/BasisChanger.tex" download="BasisChanger.tex"
+    style={{padding: '10px 20px', backgroundColor: '#10b981', color: 'white', borderRadius: '6px', textDecoration: 'none', fontWeight: 'bold'}}>
+    Download .tex
+  </a>
+  <a href="/static/inbox/BasisChanger.tex" target="_blank"
+    style={{padding: '10px 20px', backgroundColor: '#008080', color: 'white', borderRadius: '6px', textDecoration: 'none', fontWeight: 'bold'}}>
+    View Raw
+  </a>
+</div>
+
+<div style={{display: 'flex', gap: '24px', marginBottom: '24px', flexWrap: 'wrap'}}>
+  <div style={{padding: '12px 16px', backgroundColor: '#f3f4f6', borderRadius: '8px'}}>
+    <div style={{fontSize: '24px', fontWeight: 'bold', color: '#008080'}}>263</div>
+    <div style={{fontSize: '12px', color: '#6b7280'}}>Lines</div>
+  </div>
+  <div style={{padding: '12px 16px', backgroundColor: '#f3f4f6', borderRadius: '8px'}}>
+    <div style={{fontSize: '24px', fontWeight: 'bold', color: '#008080'}}>5</div>
+    <div style={{fontSize: '12px', color: '#6b7280'}}>Sections</div>
+  </div>
+</div>
+
+**Author:** ElecSus Library Documentation
+
+
+
+## Abstract
+
+This document provides comprehensive documentation for \texttt{BasisChanger.py}, which implements transformations between linear ($x$-$y$-$z$) and circular ($L$-$R$-$z$) polarization bases. These transformations are essential for connecting laboratory-frame measurements to atomic transition selection rules.
+
+
+
+## Sections
+
+1. Theoretical Foundation
+2. Line-by-Line Code Analysis
+3. Verification
+4. Physical Applications
+5. Summary
+
+
+
+## Source Code
+
+```latex title="BasisChanger.tex" showLineNumbers
+\documentclass[11pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{physics}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{geometry}
+\usepackage{hyperref}
+\usepackage{booktabs}
+
+\geometry{margin=1in}
+
+\lstset{
+    language=Python,
+    basicstyle=\ttfamily\small,
+    keywordstyle=\color{blue},
+    commentstyle=\color{green!60!black},
+    stringstyle=\color{orange},
+    numbers=left,
+    numberstyle=\tiny\color{gray},
+    breaklines=true,
+    frame=single,
+    backgroundcolor=\color{gray!10}
+}
+
+\newtheorem{axiom}{Axiom}
+\newtheorem{definition}{Definition}
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}{Lemma}
+\newtheorem{corollary}{Corollary}
+
+\title{\textbf{BasisChanger.py} \\ Electric Field Basis Transformation \\ \large Linear to Circular Polarization Conversion}
+\author{ElecSus Library Documentation}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+This document provides comprehensive documentation for \texttt{BasisChanger.py}, which implements transformations between linear ($x$-$y$-$z$) and circular ($L$-$R$-$z$) polarization bases. These transformations are essential for connecting laboratory-frame measurements to atomic transition selection rules.
+\end{abstract}
+
+\tableofcontents
+\newpage
+
+%==============================================================================
+\section{Theoretical Foundation}
+%==============================================================================
+
+\subsection{Polarization Bases for Light-Atom Interaction}
+
+\begin{axiom}[Selection Rules]
+Atomic transitions obey selection rules expressed naturally in the spherical (circular) basis:
+\begin{align}
+\sigma^+: \quad &\Delta m = +1 \quad \text{(left circular)} \\
+\sigma^-: \quad &\Delta m = -1 \quad \text{(right circular)} \\
+\pi: \quad &\Delta m = 0 \quad \text{(linear along $z$)}
+\end{align}
+\end{axiom}
+
+\begin{definition}[Spherical Basis Vectors]
+The spherical (circular) unit vectors in terms of Cartesian vectors:
+\begin{align}
+\hat{e}_{+1} &= -\frac{1}{\sqrt{2}}(\hat{x} + i\hat{y}) \quad \text{(left circular, } \sigma^+) \\
+\hat{e}_{-1} &= +\frac{1}{\sqrt{2}}(\hat{x} - i\hat{y}) \quad \text{(right circular, } \sigma^-) \\
+\hat{e}_0 &= \hat{z} \quad \text{(linear, } \pi)
+\end{align}
+\end{definition}
+
+\begin{theorem}[Convention Choice]
+Following Auzinsh, Budker, and Rochester (2010), the convention used is:
+\begin{align}
+\hat{L} &= \frac{1}{\sqrt{2}}(\hat{x} - i\hat{y}) \\
+\hat{R} &= \frac{1}{\sqrt{2}}(\hat{x} + i\hat{y})
+\end{align}
+Note: Different sign conventions exist in the literature.
+\end{theorem}
+
+\subsection{Transformation Matrices}
+
+\begin{definition}[Linear to Circular Transformation]
+The transformation matrix from $(x, y, z)$ to $(L, R, z)$:
+\begin{equation}
+U = \frac{1}{\sqrt{2}}\begin{pmatrix} 1 & -i & 0 \\ 1 & i & 0 \\ 0 & 0 & \sqrt{2} \end{pmatrix}
+\end{equation}
+\end{definition}
+
+\begin{theorem}[Inverse Transformation]
+The inverse (circular to linear):
+\begin{equation}
+U^{-1} = U^\dagger = \frac{1}{\sqrt{2}}\begin{pmatrix} 1 & 1 & 0 \\ i & -i & 0 \\ 0 & 0 & \sqrt{2} \end{pmatrix}
+\end{equation}
+The transformation is unitary: $U^\dagger U = \mathbb{1}$.
+\end{theorem}
+
+%==============================================================================
+\section{Line-by-Line Code Analysis}
+%==============================================================================
+
+\subsection{Module Imports}
+
+\begin{lstlisting}
+import numpy as np
+\end{lstlisting}
+\textit{NumPy for complex array operations.}
+
+\subsection{Linear to Circular: xyz\_to\_lrz}
+
+\begin{lstlisting}
+def xyz_to_lrz(E_in):
+    """ Convert from linear to circular bases """
+    # create output array
+    E_out = np.zeros_like(E_in,dtype='complex')
+    
+    # z-component doesn't change
+    E_out[2] = E_in[2]
+\end{lstlisting}
+\textit{Initialize complex output array. The $z$-component is invariant under this transformation.}
+
+\vspace{0.5em}
+\begin{lstlisting}
+    ## Following sign convention in 
+    ## 'Optically Polarised Atoms' by Auzinsh, Budker and Rochester
+    ## OUP, 2010
+    # L = 1./sqrt(2) * (x - iy)
+    # R = 1./sqrt(2) * (x + iy) 
+    E_out[0] = 1./np.sqrt(2) * (E_in[0] - 1.j*E_in[1])
+    E_out[1] = 1./np.sqrt(2) * (E_in[0] + 1.j*E_in[1])
+    
+    return E_out
+\end{lstlisting}
+
+\begin{equation}
+E_L = \frac{1}{\sqrt{2}}(E_x - iE_y), \quad E_R = \frac{1}{\sqrt{2}}(E_x + iE_y)
+\end{equation}
+\textit{Left circular is the combination with $-i$, right circular with $+i$.}
+
+\subsection{Circular to Linear: lrz\_to\_xyz}
+
+\begin{lstlisting}
+def lrz_to_xyz(E_in):
+    """ Convert from circular to linear bases """
+    # create output array
+    E_out = np.zeros_like(E_in,dtype='complex')
+    
+    # z-component doesn't change
+    E_out[2] = E_in[2]
+\end{lstlisting}
+\textit{Same initialization; $z$ unchanged.}
+
+\vspace{0.5em}
+\begin{lstlisting}
+    # x = 1. / sqrt(2) * [L + R]
+    # y = 1.j / sqrt(2) * [L - R]
+    E_out[0] = 1./np.sqrt(2) * (E_in[0] + E_in[1])
+    E_out[1] = 1.j/np.sqrt(2) * (E_in[0] - E_in[1])
+    
+    return E_out
+\end{lstlisting}
+
+\begin{equation}
+E_x = \frac{1}{\sqrt{2}}(E_L + E_R), \quad E_y = \frac{i}{\sqrt{2}}(E_L - E_R)
+\end{equation}
+\textit{Inverse transformation recovers Cartesian components.}
+
+%==============================================================================
+\section{Verification}
+%==============================================================================
+
+\subsection{Round-Trip Identity}
+
+\begin{theorem}[Invertibility]
+Applying both transformations in sequence:
+\begin{equation}
+\texttt{lrz\_to\_xyz}(\texttt{xyz\_to\_lrz}(\vec{E})) = \vec{E}
+\end{equation}
+\end{theorem}
+
+\begin{proof}
+Let $\vec{E} = (E_x, E_y, E_z)$. After \texttt{xyz\_to\_lrz}:
+\begin{equation}
+(E_L, E_R, E_z) = \left(\frac{E_x - iE_y}{\sqrt{2}}, \frac{E_x + iE_y}{\sqrt{2}}, E_z\right)
+\end{equation}
+After \texttt{lrz\_to\_xyz}:
+\begin{align}
+E'_x &= \frac{1}{\sqrt{2}}(E_L + E_R) = \frac{1}{\sqrt{2}} \cdot \frac{2E_x}{\sqrt{2}} = E_x \\
+E'_y &= \frac{i}{\sqrt{2}}(E_L - E_R) = \frac{i}{\sqrt{2}} \cdot \frac{-2iE_y}{\sqrt{2}} = E_y
+\end{align}
+\end{proof}
+
+\subsection{Special Cases}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{ccc}
+\toprule
+Input (xyz) & Output (LRz) & Polarization \\
+\midrule
+$(1, 0, 0)$ & $(1/\sqrt{2}, 1/\sqrt{2}, 0)$ & Linear $x$ \\
+$(0, 1, 0)$ & $(-i/\sqrt{2}, i/\sqrt{2}, 0)$ & Linear $y$ \\
+$(1, -i, 0)/\sqrt{2}$ & $(1, 0, 0)$ & Left circular \\
+$(1, i, 0)/\sqrt{2}$ & $(0, 1, 0)$ & Right circular \\
+$(0, 0, 1)$ & $(0, 0, 1)$ & Linear $z$ \\
+\bottomrule
+\end{tabular}
+\caption{Example transformations}
+\end{table}
+
+%==============================================================================
+\section{Physical Applications}
+%==============================================================================
+
+\subsection{Atomic Transition Rates}
+
+The transition amplitude for polarization $\hat{e}$ is:
+\begin{equation}
+d_{eg} = \langle e | \hat{e} \cdot \vec{d} | g \rangle
+\end{equation}
+
+In circular basis, the selection rules are simple:
+\begin{equation}
+d_{\pm 1} \propto \delta_{m_e, m_g \pm 1}, \quad d_0 \propto \delta_{m_e, m_g}
+\end{equation}
+
+\subsection{Faraday/Voigt Effects}
+
+Light propagating through an atomic medium experiences different refractive indices for $L$ and $R$ components:
+\begin{equation}
+n_L \neq n_R \quad \Rightarrow \quad \text{Faraday rotation}
+\end{equation}
+
+The basis transformation allows computing these effects from atomic susceptibilities.
+
+%==============================================================================
+\section{Summary}
+%==============================================================================
+
+The \texttt{BasisChanger.py} module provides:
+
+\begin{enumerate}
+\item \texttt{xyz\_to\_lrz(E\_in)}: Convert linear to circular basis
+\item \texttt{lrz\_to\_xyz(E\_in)}: Convert circular to linear basis
+\end{enumerate}
+
+Key features:
+\begin{itemize}
+\item Input/output are 3-component complex NumPy arrays
+\item $z$-component unchanged (quantization axis)
+\item Follows Auzinsh-Budker-Rochester sign convention
+\item Unitary transformation (preserves field amplitude)
+\item Essential for connecting lab frame to atomic selection rules
+\end{itemize}
+
+Usage:
+\begin{lstlisting}
+from BasisChanger import xyz_to_lrz, lrz_to_xyz
+E_circular = xyz_to_lrz(np.array([1, 0, 0]))  # x-polarized
+E_linear = lrz_to_xyz(np.array([1, 0, 0]))    # L-polarized
+\end{lstlisting}
+
+\end{document}
+
+```

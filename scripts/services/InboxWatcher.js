@@ -11,7 +11,7 @@
 const fs = require('fs');
 const path = require('path');
 const chokidar = require('chokidar');
-const { Logger } = require('../utils/logger');
+const { createLogger } = require('../utils/logger');
 const InboxProcessor = require('./InboxProcessor');
 
 /**
@@ -23,7 +23,7 @@ class InboxWatcher {
    */
   constructor(config) {
     this.config = config;
-    this.logger = new Logger('InboxWatcher');
+    this.logger = createLogger();
     this.processor = new InboxProcessor(config);
     this.watcher = null;
 

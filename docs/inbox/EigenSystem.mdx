@@ -1,0 +1,346 @@
+---
+title: "\textbf{EigenSystem.py - LaTeX Document"
+sidebar_label: "EigenSystem.tex"
+sidebarLabel: "EigenSystem.tex"
+tags: ["latex", "document"]
+---
+
+# \textbf{EigenSystem.py
+
+<div style={{display: 'flex', gap: '12px', flexWrap: 'wrap', marginBottom: '24px'}}>
+  <a href="/static/inbox/EigenSystem.tex" download="EigenSystem.tex"
+    style={{padding: '10px 20px', backgroundColor: '#10b981', color: 'white', borderRadius: '6px', textDecoration: 'none', fontWeight: 'bold'}}>
+    Download .tex
+  </a>
+  <a href="/static/inbox/EigenSystem.tex" target="_blank"
+    style={{padding: '10px 20px', backgroundColor: '#008080', color: 'white', borderRadius: '6px', textDecoration: 'none', fontWeight: 'bold'}}>
+    View Raw
+  </a>
+</div>
+
+<div style={{display: 'flex', gap: '24px', marginBottom: '24px', flexWrap: 'wrap'}}>
+  <div style={{padding: '12px 16px', backgroundColor: '#f3f4f6', borderRadius: '8px'}}>
+    <div style={{fontSize: '24px', fontWeight: 'bold', color: '#008080'}}>291</div>
+    <div style={{fontSize: '12px', color: '#6b7280'}}>Lines</div>
+  </div>
+  <div style={{padding: '12px 16px', backgroundColor: '#f3f4f6', borderRadius: '8px'}}>
+    <div style={{fontSize: '24px', fontWeight: 'bold', color: '#008080'}}>5</div>
+    <div style={{fontSize: '12px', color: '#6b7280'}}>Sections</div>
+  </div>
+</div>
+
+**Author:** ElecSus Library Documentation
+
+
+
+## Abstract
+
+This document provides comprehensive documentation for \texttt{EigenSystem.py}, which constructs and diagonalizes the atomic Hamiltonian for alkali atoms in external magnetic fields. The module calculates energy eigenvalues and eigenvectors for both ground and excited states, enabling the computation of atomic transition frequencies and strengths.
+
+
+
+## Sections
+
+1. Theoretical Foundation
+2. Line-by-Line Code Analysis
+3. Physical Interpretation
+4. Numerical Considerations
+5. Summary
+
+
+
+## Source Code
+
+```latex title="EigenSystem.tex" showLineNumbers
+\documentclass[11pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{physics}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{geometry}
+\usepackage{hyperref}
+\usepackage{booktabs}
+
+\geometry{margin=1in}
+
+\lstset{
+    language=Python,
+    basicstyle=\ttfamily\small,
+    keywordstyle=\color{blue},
+    commentstyle=\color{green!60!black},
+    stringstyle=\color{orange},
+    numbers=left,
+    numberstyle=\tiny\color{gray},
+    breaklines=true,
+    frame=single,
+    backgroundcolor=\color{gray!10}
+}
+
+\newtheorem{axiom}{Axiom}
+\newtheorem{definition}{Definition}
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}{Lemma}
+\newtheorem{corollary}{Corollary}
+
+\title{\textbf{EigenSystem.py} \\ Atomic Hamiltonian Eigensystem \\ \large Ground and Excited State Manifolds in Magnetic Fields}
+\author{ElecSus Library Documentation}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+This document provides comprehensive documentation for \texttt{EigenSystem.py}, which constructs and diagonalizes the atomic Hamiltonian for alkali atoms in external magnetic fields. The module calculates energy eigenvalues and eigenvectors for both ground and excited states, enabling the computation of atomic transition frequencies and strengths.
+\end{abstract}
+
+\tableofcontents
+\newpage
+
+%==============================================================================
+\section{Theoretical Foundation}
+%==============================================================================
+
+\subsection{The Atomic Hamiltonian}
+
+\begin{axiom}[Separation of Interactions]
+The atomic Hamiltonian can be written as a sum of distinct physical interactions:
+\begin{equation}
+H = H_0 + H_{FS} + H_{HFS} + H_Z
+\end{equation}
+where $H_0$ is the unperturbed energy, $H_{FS}$ is fine structure, $H_{HFS}$ is hyperfine structure, and $H_Z$ is the Zeeman interaction.
+\end{axiom}
+
+\begin{definition}[Ground State Hamiltonian]
+For the S-state (ground state) of alkali atoms ($L = 0$):
+\begin{equation}
+H_g = A_s (\vec{I} \cdot \vec{J}) + \mu_B B (g_s S_z + g_I I_z) + E_{IS}
+\end{equation}
+where $A_s$ is the ground state hyperfine constant and $E_{IS}$ is the isotope shift.
+\end{definition}
+
+\begin{definition}[Excited State Hamiltonian]
+For the P-state (excited state, $L = 1$):
+\begin{equation}
+H_e = \Delta_{FS}(\vec{L} \cdot \vec{S}) + A_p (\vec{I} \cdot \vec{J}) + B_p H_Q + \mu_B B (g_L L_z + g_s S_z + g_I I_z)
+\end{equation}
+where $\Delta_{FS}$ is the fine structure splitting, $A_p$ and $B_p$ are hyperfine constants.
+\end{definition}
+
+\subsection{Zeeman Effect}
+
+\begin{theorem}[Linear Zeeman Effect]
+In weak magnetic fields, the energy shift is:
+\begin{equation}
+\Delta E_Z = \mu_B g_F m_F B
+\end{equation}
+where $g_F$ is the Land\'e g-factor for the hyperfine level.
+\end{theorem}
+
+\begin{theorem}[Breit-Rabi Formula]
+For the ground state of alkali atoms, the exact energy is:
+\begin{equation}
+E(F, m_F) = -\frac{\Delta E_{HFS}}{2(2I+1)} + g_I \mu_B m_F B \pm \frac{\Delta E_{HFS}}{2}\sqrt{1 + \frac{4m_F x}{2I+1} + x^2}
+\end{equation}
+where $x = (g_J - g_I)\mu_B B / \Delta E_{HFS}$.
+\end{theorem}
+
+\subsection{Diagonalization}
+
+\begin{theorem}[Eigenvalue Problem]
+The energy levels are found by solving:
+\begin{equation}
+H |\psi_n\rangle = E_n |\psi_n\rangle
+\end{equation}
+The eigenvectors $|\psi_n\rangle$ are superpositions of the uncoupled basis states.
+\end{theorem}
+
+%==============================================================================
+\section{Line-by-Line Code Analysis}
+%==============================================================================
+
+\subsection{Module Imports}
+
+\begin{lstlisting}
+from scipy.linalg import eig, eigh
+from numpy import pi, append, transpose, identity
+
+from AtomConstants import *
+from FundamentalConstants import *
+from sz_lsi import sz, lz, Iz
+from fs_hfs import Hfs,Hhfs,Bbhfs
+\end{lstlisting}
+\textit{Import eigenvalue solvers, atomic constants, and interaction matrices.}
+
+\subsection{Hamiltonian Class Initialization}
+
+\begin{lstlisting}
+class Hamiltonian(object):
+    """Functions to create the atomic hamiltonian."""
+
+    def __init__(self, Isotope, Trans, gL, Bfield):
+        """Ground and excited state Hamiltonian for an isotope"""
+        if Isotope=='Rb87':
+            atom = Rb87
+        elif Isotope=='Rb85':
+            atom = Rb85
+        # ... [other isotopes]
+\end{lstlisting}
+\textit{Select atomic species and load corresponding constants (nuclear spin $I$, hyperfine constants, etc.).}
+
+\vspace{0.5em}
+\begin{lstlisting}
+        if Bfield == 0.0:
+            Bfield += 1e-5 # avoid degeneracy problem
+\end{lstlisting}
+\textit{Add small field to lift degeneracy and ensure unique eigenstates.}
+
+\vspace{0.5em}
+\begin{lstlisting}
+        self.ds=int((2*S+1)*(2*atom.I+1))
+        self.dp=int(3*(2*S+1)*(2*atom.I+1))
+\end{lstlisting}
+\begin{equation}
+d_S = (2S+1)(2I+1), \quad d_P = 3(2S+1)(2I+1)
+\end{equation}
+\textit{Matrix dimensions: S-state has $L=0$ (factor 1), P-state has $L=1$ (factor 3).}
+
+\subsection{Ground State Manifold}
+
+\begin{lstlisting}
+def groundStateManifold(self,gI,I,A_hyp_coeff,IsotopeShift,Bfield):
+    """Function to produce the ground state manifold"""
+    ds = int((2*S+1)*(2*I+1))
+    As = A_hyp_coeff
+    S_StateHamiltonian = As*Hhfs(0.0,S,I)+IsotopeShift*identity(ds)
+\end{lstlisting}
+\begin{equation}
+H_g = A_s (\vec{I} \cdot \vec{J}) + E_{IS} \cdot \mathbb{1}
+\end{equation}
+\textit{Hyperfine interaction plus isotope shift for ground state ($L=0$).}
+
+\vspace{0.5em}
+\begin{lstlisting}
+    Ez = muB*Bfield*1.e-4/(hbar*2.0*pi*1.0e6)
+    S_StateHamiltonian += Ez*(gs*sz(0.0,S,I)+gI*Iz(0.0,S,I))
+\end{lstlisting}
+\begin{equation}
+H_Z = \frac{\mu_B B}{h} (g_s S_z + g_I I_z)
+\end{equation}
+\textit{Zeeman interaction. Field in Gauss ($10^{-4}$ T), energies in MHz.}
+
+\vspace{0.5em}
+\begin{lstlisting}
+    EigenSystem = eigh(S_StateHamiltonian)
+    EigenValues = EigenSystem[0].real
+    EigenVectors = EigenSystem[1]
+    stateManifold = append([EigenValues],EigenVectors,axis=0)
+    sortedManifold = sorted(transpose(stateManifold),key=(lambda i:i[0]))
+    return sortedManifold, EigenValues
+\end{lstlisting}
+\textit{Diagonalize using Hermitian eigenvalue solver. Sort states by energy.}
+
+\subsection{Excited State Manifold}
+
+\begin{lstlisting}
+def excitedStateManifold(self,gL,gI,I,A_hyp_coeff,B_hyp_coeff,Bfield):
+    """Function to produce the excited state manifold"""
+    dp = int(3*(2*S+1)*(2*I+1))
+    FS = self.atom.FS
+    Ap = A_hyp_coeff
+    Bp = B_hyp_coeff
+\end{lstlisting}
+\textit{P-state parameters: fine structure splitting and hyperfine constants.}
+
+\vspace{0.5em}
+\begin{lstlisting}
+    if Bp==0.0:
+        P_StateHamiltonian=FS*Hfs(1.0,S,I)+FS*identity(dp)+Ap*Hhfs(1.0,S,I)
+    if Bp!=0.0:
+        P_StateHamiltonian=FS*Hfs(1.0,S,I)-(FS/2.0)*identity(dp)+Ap*Hhfs(1.0,S,I)
+        P_StateHamiltonian+=Bp*Bbhfs(1.0,S,I)
+\end{lstlisting}
+\begin{equation}
+H_e = \Delta_{FS}(\vec{L} \cdot \vec{S}) + A_p(\vec{I} \cdot \vec{J}) + B_p H_Q + E_0
+\end{equation}
+\textit{Fine structure, hyperfine, and quadrupole interactions for P-state.}
+
+\vspace{0.5em}
+\begin{lstlisting}
+    E=muB*(Bfield*1.0e-4)/(hbar*2.0*pi*1.0e6)
+    P_StateHamiltonian+=E*(gL*lz(1.0,S,I)+gs*sz(1.0,S,I)+gI*Iz(1.0,S,I))
+\end{lstlisting}
+\begin{equation}
+H_Z = \frac{\mu_B B}{h} (g_L L_z + g_s S_z + g_I I_z)
+\end{equation}
+\textit{Zeeman interaction including orbital contribution for $L=1$.}
+
+%==============================================================================
+\section{Physical Interpretation}
+%==============================================================================
+
+\subsection{Energy Level Structure}
+
+\begin{itemize}
+\item \textbf{Zero field}: States labeled by $|F, m_F\rangle$ with $(2F+1)$-fold degeneracy
+\item \textbf{Weak field}: Linear Zeeman splitting, $\Delta E \propto m_F B$
+\item \textbf{Strong field}: Paschen-Back regime, states labeled by $|m_J, m_I\rangle$
+\end{itemize}
+
+\subsection{State Mixing}
+
+As $B$ increases, eigenstates evolve from $|F, m_F\rangle$ character to $|m_J, m_I\rangle$ character. The eigenvector components track this evolution.
+
+\subsection{Selection Rules}
+
+Optical transitions between ground and excited manifolds follow:
+\begin{equation}
+\Delta m_F = 0, \pm 1
+\end{equation}
+for $\pi$, $\sigma^\pm$ polarizations respectively.
+
+%==============================================================================
+\section{Numerical Considerations}
+%==============================================================================
+
+\subsection{Degeneracy Handling}
+
+At $B = 0$, states with the same $F$ are degenerate. Adding $10^{-5}$ G breaks this degeneracy for numerical stability.
+
+\subsection{Energy Units}
+
+All energies are in MHz. The conversion factor:
+\begin{equation}
+\frac{\mu_B B}{h} = 1.3996 \text{ MHz/G}
+\end{equation}
+
+\subsection{State Ordering}
+
+States are sorted by energy (lowest first), enabling consistent identification across field values.
+
+%==============================================================================
+\section{Summary}
+%==============================================================================
+
+The \texttt{EigenSystem.py} module provides:
+
+\begin{enumerate}
+\item \texttt{Hamiltonian} class: Main interface for atomic calculations
+\item \texttt{groundStateManifold}: S-state energies and eigenvectors
+\item \texttt{excitedStateManifold}: P-state energies and eigenvectors
+\end{enumerate}
+
+Supported atoms: Rb-85, Rb-87, Cs-133, K-39, K-40, K-41, Na-23, and an ideal test atom.
+
+Key outputs:
+\begin{itemize}
+\item \texttt{groundEnergies}: Array of ground state energies in MHz
+\item \texttt{excitedEnergies}: Array of excited state energies in MHz
+\item \texttt{groundManifold}: Sorted list of (energy, eigenvector) pairs
+\item \texttt{excitedManifold}: Sorted list of (energy, eigenvector) pairs
+\end{itemize}
+
+\end{document}
+
+```

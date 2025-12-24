@@ -1,0 +1,135 @@
+---
+title: "Inbox Folder - Automatic MDX Documentation Generator"
+sidebar_label: "README.md"
+sidebarLabel: "README.md"
+tags: ["markdown", "documentation"]
+---
+
+# Inbox Folder - Automatic MDX Documentation Generator
+
+<div style={{marginBottom: '24px'}}>
+  <a href="/static/inbox/README.md" download="README.md"
+    style={{padding: '10px 20px', backgroundColor: '#10b981', color: 'white', borderRadius: '6px', textDecoration: 'none', fontWeight: 'bold'}}>
+    Download Original
+  </a>
+</div>
+
+
+Drop files into this folder to automatically generate MDX documentation for Docusaurus.
+
+## Supported File Types
+
+| Extension | Type | Description |
+|-----------|------|-------------|
+| `.pdf` | PDF Documents | Embedded PDF viewer with download link |
+| `.tex` | LaTeX | Syntax-highlighted source with metadata extraction |
+| `.py` | Python | Extracts docstrings, classes, functions, imports |
+| `.m` | MATLAB | Extracts function signatures and header comments |
+| `.ipynb` | Jupyter Notebook | Renders markdown and code cells |
+| `.html` | HTML | Embedded iframe preview with source code |
+| `.txt` | Plain Text | Simple text display with stats |
+| `.md` | Markdown | Converts to MDX format |
+| `.rst` | reStructuredText | Displays RST source |
+
+## Folder Structure
+
+```
+inbox/
+├── pdf/           # Drop PDF files here
+├── latex/         # Drop LaTeX files here
+├── python/        # Drop Python files here
+├── notebooks/     # Drop Jupyter notebooks here
+├── other/         # Drop other files here
+└── README.md      # This file
+```
+
+**Note:** Subfolders are optional. You can drop files directly into the `inbox/` folder.
+
+## Usage
+
+### Option 1: Watch Mode (Automatic)
+
+Start the watcher to automatically process files as you drop them:
+
+```bash
+cd scripts
+npm run inbox:watch
+```
+
+Or directly:
+```bash
+node scripts/watch-inbox.js
+```
+
+### Option 2: Process Once
+
+Process all existing files without watching:
+
+```bash
+cd scripts
+npm run inbox:process
+```
+
+Or directly:
+```bash
+node scripts/watch-inbox.js --process
+```
+
+### Custom Inbox Folder
+
+Use a different folder as inbox:
+
+```bash
+node scripts/watch-inbox.js --source ./my-documents
+```
+
+## Output
+
+Generated files are saved to:
+- **MDX files**: `docs/inbox/`
+- **Static files**: `docs/static/inbox/`
+
+## Example
+
+1. Drop `my_analysis.py` into the `inbox/python/` folder
+2. The watcher detects the new file
+3. Generates `docs/inbox/my_analysis.mdx` with:
+   - Download button
+   - Statistics (lines, classes, functions)
+   - Extracted docstring
+   - Dependencies list
+   - Syntax-highlighted source code
+4. Copies the original file to `docs/static/inbox/my_analysis.py`
+
+## Installation
+
+Before first use, install dependencies:
+
+```bash
+cd scripts
+npm install
+```
+
+This installs `chokidar` for file watching.
+
+## Troubleshooting
+
+### "chokidar is not installed"
+
+Run `npm install` in the scripts folder:
+```bash
+cd scripts
+npm install
+```
+
+### Files not being processed
+
+1. Check the file extension is supported (see table above)
+2. Ensure the file is fully written (large files need time to copy)
+3. Check the console for error messages
+
+### Generated MDX has errors
+
+- Ensure the source file is valid (valid JSON for .ipynb, valid syntax for code files)
+- Check for special characters in filenames (use alphanumeric and underscores)
+

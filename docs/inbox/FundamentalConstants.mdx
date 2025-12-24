@@ -1,0 +1,275 @@
+---
+title: "\textbf{FundamentalConstants.py - LaTeX Document"
+sidebar_label: "FundamentalConstants.tex"
+sidebarLabel: "FundamentalConstants.tex"
+tags: ["latex", "document"]
+---
+
+# \textbf{FundamentalConstants.py
+
+<div style={{display: 'flex', gap: '12px', flexWrap: 'wrap', marginBottom: '24px'}}>
+  <a href="/static/inbox/FundamentalConstants.tex" download="FundamentalConstants.tex"
+    style={{padding: '10px 20px', backgroundColor: '#10b981', color: 'white', borderRadius: '6px', textDecoration: 'none', fontWeight: 'bold'}}>
+    Download .tex
+  </a>
+  <a href="/static/inbox/FundamentalConstants.tex" target="_blank"
+    style={{padding: '10px 20px', backgroundColor: '#008080', color: 'white', borderRadius: '6px', textDecoration: 'none', fontWeight: 'bold'}}>
+    View Raw
+  </a>
+</div>
+
+<div style={{display: 'flex', gap: '24px', marginBottom: '24px', flexWrap: 'wrap'}}>
+  <div style={{padding: '12px 16px', backgroundColor: '#f3f4f6', borderRadius: '8px'}}>
+    <div style={{fontSize: '24px', fontWeight: 'bold', color: '#008080'}}>221</div>
+    <div style={{fontSize: '12px', color: '#6b7280'}}>Lines</div>
+  </div>
+  <div style={{padding: '12px 16px', backgroundColor: '#f3f4f6', borderRadius: '8px'}}>
+    <div style={{fontSize: '24px', fontWeight: 'bold', color: '#008080'}}>4</div>
+    <div style={{fontSize: '12px', color: '#6b7280'}}>Sections</div>
+  </div>
+</div>
+
+**Author:** ElecSus Library Documentation
+
+
+
+## Abstract
+
+This document provides comprehensive documentation for \texttt{FundamentalConstants.py}, which defines the fundamental physical constants required for atomic spectroscopy calculations. These constants form the foundation for computing Zeeman shifts, hyperfine structure, and optical transitions in alkali atoms.
+
+
+
+## Sections
+
+1. Theoretical Foundation
+2. Line-by-Line Code Analysis
+3. Physical Applications
+4. Summary
+
+
+
+## Source Code
+
+```latex title="FundamentalConstants.tex" showLineNumbers
+\documentclass[11pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{physics}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{geometry}
+\usepackage{hyperref}
+\usepackage{booktabs}
+
+\geometry{margin=1in}
+
+\lstset{
+    language=Python,
+    basicstyle=\ttfamily\small,
+    keywordstyle=\color{blue},
+    commentstyle=\color{green!60!black},
+    stringstyle=\color{orange},
+    numbers=left,
+    numberstyle=\tiny\color{gray},
+    breaklines=true,
+    frame=single,
+    backgroundcolor=\color{gray!10}
+}
+
+\newtheorem{axiom}{Axiom}
+\newtheorem{definition}{Definition}
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}{Lemma}
+\newtheorem{corollary}{Corollary}
+
+\title{\textbf{FundamentalConstants.py} \\ Physical Constants for Atomic Physics \\ \large CODATA Values and Atomic Parameters}
+\author{ElecSus Library Documentation}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+This document provides comprehensive documentation for \texttt{FundamentalConstants.py}, which defines the fundamental physical constants required for atomic spectroscopy calculations. These constants form the foundation for computing Zeeman shifts, hyperfine structure, and optical transitions in alkali atoms.
+\end{abstract}
+
+\tableofcontents
+\newpage
+
+%==============================================================================
+\section{Theoretical Foundation}
+%==============================================================================
+
+\subsection{Fundamental Constants in Atomic Physics}
+
+\begin{axiom}[CODATA Standards]
+Physical constants used in precision atomic physics calculations must conform to CODATA recommended values to ensure reproducibility and accuracy across different implementations.
+\end{axiom}
+
+\begin{definition}[Bohr Magneton]
+The Bohr magneton is the natural unit of magnetic moment for an electron:
+\begin{equation}
+\mu_B = \frac{e\hbar}{2m_e} \approx 9.274 \times 10^{-24} \text{ J/T}
+\end{equation}
+\end{definition}
+
+\begin{definition}[Electron g-factor]
+The electron spin g-factor relates the magnetic moment to the spin angular momentum:
+\begin{equation}
+\vec{\mu}_s = -g_s \frac{\mu_B}{\hbar} \vec{S}
+\end{equation}
+where $g_s \approx 2.002319$ (including QED corrections).
+\end{definition}
+
+\begin{theorem}[Zeeman Energy]
+The magnetic interaction energy for an electron in field $\vec{B}$ is:
+\begin{equation}
+H_Z = -\vec{\mu} \cdot \vec{B} = \mu_B (g_L L_z + g_S S_z) B
+\end{equation}
+where $g_L = 1$ for orbital and $g_S \approx 2$ for spin contributions.
+\end{theorem}
+
+\subsection{Atomic Units and Conversions}
+
+\begin{definition}[Bohr Radius]
+The characteristic length scale of atomic physics:
+\begin{equation}
+a_0 = \frac{4\pi\epsilon_0\hbar^2}{m_e e^2} \approx 5.292 \times 10^{-11} \text{ m}
+\end{equation}
+\end{definition}
+
+\begin{definition}[Atomic Mass Unit]
+The unified atomic mass unit:
+\begin{equation}
+1 \text{ amu} = \frac{m(^{12}\text{C})}{12} \approx 1.661 \times 10^{-27} \text{ kg}
+\end{equation}
+\end{definition}
+
+%==============================================================================
+\section{Line-by-Line Code Analysis}
+%==============================================================================
+
+\subsection{Module Imports}
+
+\begin{lstlisting}
+from numpy import pi, sqrt
+from scipy.constants import physical_constants, epsilon_0, hbar, c, e, h
+\end{lstlisting}
+\textit{Import mathematical functions and CODATA physical constants from SciPy.}
+
+\subsection{Electron Spin}
+
+\begin{lstlisting}
+S=0.5 #Electron spin
+\end{lstlisting}
+\begin{equation}
+S = \frac{1}{2}
+\end{equation}
+\textit{Fundamental quantum number for electron spin. All alkali atoms have a single valence electron with $S = 1/2$.}
+
+\subsection{Electron g-factor}
+
+\begin{lstlisting}
+gs = -physical_constants['electron g factor'][0]
+\end{lstlisting}
+\begin{equation}
+g_s = -g_e \approx 2.002319
+\end{equation}
+\textit{The negative sign convention ensures proper orientation of magnetic moment relative to spin. The CODATA value includes QED corrections.}
+
+\subsection{Bohr Magneton}
+
+\begin{lstlisting}
+muB=physical_constants['Bohr magneton'][0]
+\end{lstlisting}
+\begin{equation}
+\mu_B = \frac{e\hbar}{2m_e} = 9.274009994 \times 10^{-24} \text{ J/T}
+\end{equation}
+\textit{Natural unit for atomic magnetic moments, essential for Zeeman effect calculations.}
+
+\subsection{Boltzmann Constant}
+
+\begin{lstlisting}
+kB=physical_constants['Boltzmann constant'][0]
+\end{lstlisting}
+\begin{equation}
+k_B = 1.380649 \times 10^{-23} \text{ J/K}
+\end{equation}
+\textit{Relates temperature to thermal energy, crucial for Doppler broadening calculations.}
+
+\subsection{Atomic Mass Unit}
+
+\begin{lstlisting}
+amu=physical_constants['atomic mass constant'][0]
+\end{lstlisting}
+\begin{equation}
+1 \text{ amu} = 1.66053906660 \times 10^{-27} \text{ kg}
+\end{equation}
+\textit{Used to convert atomic masses to SI units for velocity calculations.}
+
+\subsection{Vacuum Permittivity}
+
+\begin{lstlisting}
+e0=epsilon_0 #Permittivity of free space
+\end{lstlisting}
+\begin{equation}
+\epsilon_0 = 8.8541878128 \times 10^{-12} \text{ F/m}
+\end{equation}
+\textit{Appears in dipole matrix element calculations and field-matter interactions.}
+
+\subsection{Bohr Radius}
+
+\begin{lstlisting}
+a0=physical_constants['Bohr radius'][0]
+\end{lstlisting}
+\begin{equation}
+a_0 = \frac{4\pi\epsilon_0\hbar^2}{m_e e^2} = 5.29177210903 \times 10^{-11} \text{ m}
+\end{equation}
+\textit{Characteristic atomic length scale, defines the size of electronic wavefunctions.}
+
+%==============================================================================
+\section{Physical Applications}
+%==============================================================================
+
+\subsection{Zeeman Effect Calculations}
+
+The magnetic field interaction uses $\mu_B$ and $g_s$:
+\begin{equation}
+\Delta E = \mu_B B (m_L g_L + m_S g_S + m_I g_I)
+\end{equation}
+
+\subsection{Doppler Width}
+
+Temperature-dependent line broadening uses $k_B$ and atomic mass:
+\begin{equation}
+\Delta\nu_D = \nu_0 \sqrt{\frac{8 k_B T \ln 2}{m c^2}}
+\end{equation}
+
+\subsection{Dipole Matrix Elements}
+
+The transition dipole moment involves $a_0$ and $e$:
+\begin{equation}
+d = e \langle \psi_f | \vec{r} | \psi_i \rangle \sim e \cdot a_0
+\end{equation}
+
+%==============================================================================
+\section{Summary}
+%==============================================================================
+
+This module provides the essential physical constants for atomic physics calculations:
+
+\begin{enumerate}
+\item $S = 1/2$: Electron spin quantum number
+\item $g_s \approx 2$: Electron spin g-factor
+\item $\mu_B$: Bohr magneton for magnetic interactions
+\item $k_B$: Boltzmann constant for thermal effects
+\item $\epsilon_0, a_0$: Electromagnetic and atomic length scales
+\item amu: Mass unit for velocity/Doppler calculations
+\end{enumerate}
+
+These constants are imported by other modules in the ElecSus package for computing atomic spectra.
+
+\end{document}
+
+```

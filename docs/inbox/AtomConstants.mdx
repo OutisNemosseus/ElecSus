@@ -1,0 +1,387 @@
+---
+title: "\textbf{AtomConstants.py - LaTeX Document"
+sidebar_label: "AtomConstants.tex"
+sidebarLabel: "AtomConstants.tex"
+tags: ["latex", "document"]
+---
+
+# \textbf{AtomConstants.py
+
+<div style={{display: 'flex', gap: '12px', flexWrap: 'wrap', marginBottom: '24px'}}>
+  <a href="/static/inbox/AtomConstants.tex" download="AtomConstants.tex"
+    style={{padding: '10px 20px', backgroundColor: '#10b981', color: 'white', borderRadius: '6px', textDecoration: 'none', fontWeight: 'bold'}}>
+    Download .tex
+  </a>
+  <a href="/static/inbox/AtomConstants.tex" target="_blank"
+    style={{padding: '10px 20px', backgroundColor: '#008080', color: 'white', borderRadius: '6px', textDecoration: 'none', fontWeight: 'bold'}}>
+    View Raw
+  </a>
+</div>
+
+<div style={{display: 'flex', gap: '24px', marginBottom: '24px', flexWrap: 'wrap'}}>
+  <div style={{padding: '12px 16px', backgroundColor: '#f3f4f6', borderRadius: '8px'}}>
+    <div style={{fontSize: '24px', fontWeight: 'bold', color: '#008080'}}>331</div>
+    <div style={{fontSize: '12px', color: '#6b7280'}}>Lines</div>
+  </div>
+  <div style={{padding: '12px 16px', backgroundColor: '#f3f4f6', borderRadius: '8px'}}>
+    <div style={{fontSize: '24px', fontWeight: 'bold', color: '#008080'}}>6</div>
+    <div style={{fontSize: '12px', color: '#6b7280'}}>Sections</div>
+  </div>
+</div>
+
+**Author:** ElecSus Library Documentation
+
+
+
+## Abstract
+
+This document provides comprehensive documentation for \texttt{AtomConstants.py}, which contains all spectroscopic constants for alkali atoms supported by the ElecSus library. These include nuclear spins, hyperfine constants, transition wavelengths, and natural linewidths essential for calculating atomic spectra.
+
+
+
+## Sections
+
+1. Theoretical Foundation
+2. Atomic Species Classes
+3. Transition Classes
+4. Isotope-Transition Classes
+5. Usage Notes
+6. Summary
+
+
+
+## Source Code
+
+```latex title="AtomConstants.tex" showLineNumbers
+\documentclass[11pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{physics}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{geometry}
+\usepackage{hyperref}
+\usepackage{booktabs}
+\usepackage{longtable}
+
+\geometry{margin=1in}
+
+\lstset{
+    language=Python,
+    basicstyle=\ttfamily\small,
+    keywordstyle=\color{blue},
+    commentstyle=\color{green!60!black},
+    stringstyle=\color{orange},
+    numbers=left,
+    numberstyle=\tiny\color{gray},
+    breaklines=true,
+    frame=single,
+    backgroundcolor=\color{gray!10}
+}
+
+\newtheorem{axiom}{Axiom}
+\newtheorem{definition}{Definition}
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}{Lemma}
+\newtheorem{corollary}{Corollary}
+
+\title{\textbf{AtomConstants.py} \\ Atomic and Transition Constants \\ \large Spectroscopic Data for Alkali Atoms}
+\author{ElecSus Library Documentation}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+This document provides comprehensive documentation for \texttt{AtomConstants.py}, which contains all spectroscopic constants for alkali atoms supported by the ElecSus library. These include nuclear spins, hyperfine constants, transition wavelengths, and natural linewidths essential for calculating atomic spectra.
+\end{abstract}
+
+\tableofcontents
+\newpage
+
+%==============================================================================
+\section{Theoretical Foundation}
+%==============================================================================
+
+\subsection{Atomic Structure Parameters}
+
+\begin{definition}[Nuclear Spin]
+The nuclear spin $I$ determines the hyperfine structure:
+\begin{equation}
+F = |I - J|, |I - J| + 1, \ldots, I + J
+\end{equation}
+giving $(2\min(I,J) + 1)$ hyperfine levels for each fine structure state.
+\end{definition}
+
+\begin{definition}[Magnetic Dipole Hyperfine Constant]
+The $A$ coefficient characterizes the $\vec{I} \cdot \vec{J}$ interaction:
+\begin{equation}
+A = \frac{\mu_0 g_I \mu_N \mu_B}{4\pi} \frac{1}{I J} \langle r^{-3} \rangle
+\end{equation}
+\end{definition}
+
+\begin{definition}[Electric Quadrupole Hyperfine Constant]
+The $B$ coefficient (for $I \geq 1$, $J \geq 1$):
+\begin{equation}
+B = e Q \langle \frac{\partial^2 V}{\partial z^2} \rangle_0
+\end{equation}
+where $Q$ is the nuclear quadrupole moment.
+\end{definition}
+
+\begin{theorem}[Hyperfine Energy Levels]
+The hyperfine energy is:
+\begin{equation}
+E_{HFS} = \frac{A \cdot K}{2} + B \frac{\frac{3}{2}K(K+1) - 2I(I+1)J(J+1)}{4I(2I-1)J(2J-1)}
+\end{equation}
+where $K = F(F+1) - I(I+1) - J(J+1)$.
+\end{theorem}
+
+\subsection{Transition Properties}
+
+\begin{definition}[Natural Linewidth]
+The spontaneous decay rate determines the natural linewidth:
+\begin{equation}
+\Gamma = \frac{\omega_0^3 |\langle e|d|g \rangle|^2}{3\pi\epsilon_0 \hbar c^3}
+\end{equation}
+\end{definition}
+
+\begin{definition}[Dipole Matrix Element]
+The transition dipole strength:
+\begin{equation}
+d = \sqrt{\frac{3\epsilon_0 \hbar \Gamma \lambda^3}{8\pi}}
+\end{equation}
+\end{definition}
+
+%==============================================================================
+\section{Atomic Species Classes}
+%==============================================================================
+
+\subsection{Rubidium-85}
+
+\begin{lstlisting}
+class Rb85:
+    """Constants relating to the rubidium-85 atom"""
+    I  = 2.5         #Nuclear spin
+    As = 1011.910813 #Ground state hyperfine constant in units of MHz
+    gI = -0.00029364 #nuclear spin g-factor
+    mass = 84.911789732*amu
+    FS = 7.123e6 # Fine-structure splitting
+\end{lstlisting}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{lll}
+\toprule
+Parameter & Value & Units \\
+\midrule
+$I$ & $5/2$ & -- \\
+$A_s$ & 1011.91 & MHz \\
+$g_I$ & $-2.9364 \times 10^{-4}$ & -- \\
+mass & 84.91 & amu \\
+$\Delta_{FS}$ & 7.123 & THz \\
+\bottomrule
+\end{tabular}
+\caption{$^{85}$Rb atomic constants}
+\end{table}
+
+\subsection{Rubidium-87}
+
+\begin{lstlisting}
+class Rb87:
+    """Constants relating to the rubidium-87 atom"""
+    I  = 1.5 
+    As = 3417.341305452145 
+    gI = -0.0009951414 
+    mass = 86.909180520*amu
+    FS = 7.123e6
+\end{lstlisting}
+
+\textit{$^{87}$Rb has smaller nuclear spin ($I=3/2$) but larger hyperfine constant than $^{85}$Rb.}
+
+\subsection{Cesium-133}
+
+\begin{lstlisting}
+class Cs:
+    """Constants relating to the caesium-133 atom"""
+    I  = 3.5
+    As = 2298.1579425
+    gI = -0.00039885395
+    mass = 132.905451931*amu
+    FS = 351725718.50 - 335116048.807
+\end{lstlisting}
+
+\textit{The Cs ground state hyperfine splitting (9.19 GHz) defines the SI second.}
+
+\subsection{Potassium Isotopes}
+
+\begin{lstlisting}
+class K39:
+    I  = 1.5
+    As = 230.8598601
+    # ...
+
+class K40:
+    I  = 4.0
+    As = -285.7308  # Negative due to nuclear structure
+    # ...
+
+class K41:
+    I  = 1.5
+    As = 127.0069352
+    # ...
+\end{lstlisting}
+
+\textit{$^{40}$K is notable for having negative hyperfine constant and large nuclear spin.}
+
+\subsection{Sodium-23}
+
+\begin{lstlisting}
+class Na:
+    I  = 1.5
+    As = 885.81306440
+    gI = -0.00080461080
+    mass = 22.9897692807*amu
+\end{lstlisting}
+
+%==============================================================================
+\section{Transition Classes}
+%==============================================================================
+
+\subsection{D-Line Transitions}
+
+\begin{definition}[D1 and D2 Lines]
+The D-lines are transitions from the ground $nS_{1/2}$ state:
+\begin{align}
+\text{D1}: \quad nS_{1/2} &\rightarrow nP_{1/2} \\
+\text{D2}: \quad nS_{1/2} &\rightarrow nP_{3/2}
+\end{align}
+\end{definition}
+
+\subsection{Rubidium D-Lines}
+
+\begin{lstlisting}
+class RbD1Transition:
+    wavelength=794.978969380e-9
+    wavevectorMagnitude=2.0*pi/wavelength
+    NatGamma=5.746  # MHz
+    dipoleStrength=3.0*sqrt(e0*hbar*(2.0*NatGamma*(10.0**6))*(wavelength**3)/(8.0*pi))
+    v0=377107407.299e6  # Hz
+
+class RbD2Transition:
+    wavelength=780.2413272e-9
+    NatGamma=6.065
+    v0=384230426.6e6
+\end{lstlisting}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{lcccc}
+\toprule
+Transition & $\lambda$ (nm) & $\nu_0$ (THz) & $\Gamma$ (MHz) \\
+\midrule
+Rb D1 & 794.98 & 377.11 & 5.75 \\
+Rb D2 & 780.24 & 384.23 & 6.07 \\
+\bottomrule
+\end{tabular}
+\caption{Rubidium D-line parameters}
+\end{table}
+
+\subsection{Cesium D-Lines}
+
+\begin{lstlisting}
+class CsD1Transition:
+    wavelength=894.59295986e-9
+    NatGamma=4.584
+    v0=335116048.807e6
+
+class CsD2Transition:
+    wavelength=852.34727582e-9
+    NatGamma=5.225
+    v0=351725718.50e6
+\end{lstlisting}
+
+%==============================================================================
+\section{Isotope-Transition Classes}
+%==============================================================================
+
+\subsection{Excited State Hyperfine Constants}
+
+\begin{lstlisting}
+class Rb87_D2:
+    Ap = 84.7185      # MHz
+    Bp = 12.4965      # MHz
+    IsotopeShift = -56.361  # MHz
+\end{lstlisting}
+
+\begin{theorem}[Isotope Shift]
+The isotope shift arises from:
+\begin{equation}
+\Delta E_{IS} = \Delta E_{mass} + \Delta E_{field}
+\end{equation}
+where mass shift is due to nuclear recoil and field shift is due to finite nuclear size.
+\end{theorem}
+
+\subsection{Complete Parameter Tables}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{lccccc}
+\toprule
+Isotope & Transition & $A_p$ (MHz) & $B_p$ (MHz) & IS (MHz) \\
+\midrule
+$^{85}$Rb & D1 & 120.64 & 0 & 21.62 \\
+$^{85}$Rb & D2 & 25.04 & 26.01 & 21.73 \\
+$^{87}$Rb & D1 & 406.15 & 0 & $-$56.08 \\
+$^{87}$Rb & D2 & 84.72 & 12.50 & $-$56.36 \\
+$^{133}$Cs & D1 & 291.92 & 0 & 0 \\
+$^{133}$Cs & D2 & 50.29 & $-$0.49 & 0 \\
+\bottomrule
+\end{tabular}
+\caption{Excited state hyperfine parameters}
+\end{table}
+
+%==============================================================================
+\section{Usage Notes}
+%==============================================================================
+
+\subsection{Dipole Strength Formula}
+
+The code computes the reduced dipole matrix element:
+\begin{lstlisting}
+dipoleStrength=3.0*sqrt(e0*hbar*(2.0*NatGamma*(10.0**6))*(wavelength**3)/(8.0*pi))
+\end{lstlisting}
+
+This follows from inverting the spontaneous emission rate formula.
+
+\subsection{Transitions Dictionary}
+
+\begin{lstlisting}
+transitions = {'RbD1':RbD1Transition, 'RbD2':RbD2Transition,
+               'CsD1':CsD1Transition, 'CsD2':CsD2Transition,
+               # ...
+              }
+\end{lstlisting}
+
+\textit{Enables programmatic access to transition properties by name.}
+
+%==============================================================================
+\section{Summary}
+%==============================================================================
+
+The \texttt{AtomConstants.py} module provides:
+
+\begin{enumerate}
+\item Atomic species classes: Nuclear spin, hyperfine constants, mass
+\item Transition classes: Wavelength, linewidth, dipole strength
+\item Isotope-transition classes: Excited state parameters, isotope shifts
+\item Convenience dictionary for programmatic access
+\end{enumerate}
+
+Supported species: Rb-85, Rb-87, Cs-133, K-39, K-40, K-41, Na-23, IdealAtom.
+
+All constants are in SI units except hyperfine constants (MHz) and masses (amu).
+
+\end{document}
+
+```

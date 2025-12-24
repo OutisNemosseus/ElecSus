@@ -20,9 +20,9 @@ const fs = require('fs');
 const { createConfig } = require('./config');
 const InboxWatcher = require('./services/InboxWatcher');
 const InboxProcessor = require('./services/InboxProcessor');
-const { Logger } = require('./utils/logger');
+const { createLogger } = require('./utils/logger');
 
-const logger = new Logger('InboxCLI');
+const logger = createLogger();
 
 /**
  * Print help message

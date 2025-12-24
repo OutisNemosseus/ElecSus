@@ -3,6 +3,27 @@ const sidebars = {
   libsSidebar: [
     {
       type: 'category',
+      label: 'PDF & LaTeX Docs',
+      link: {
+        type: 'doc',
+        id: 'inbox/index',
+      },
+      items: [
+        'inbox/AtomConstants',
+        'inbox/BasisChanger',
+        'inbox/EigenSystem',
+        'inbox/FundamentalConstants',
+        'inbox/JonesMatrices',
+        'inbox/MLFittingRoutine',
+        'inbox/ang_mom',
+        'inbox/ang_mom_p',
+        'inbox/data_proc',
+        'inbox/durhamcolours',
+        'inbox/fs_hfs',
+      ],
+    },
+    {
+      type: 'category',
       label: 'Library Reference',
       link: {
         type: 'doc',

@@ -1,0 +1,305 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{physics}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{geometry}
+\usepackage{hyperref}
+\usepackage{booktabs}
+
+\geometry{margin=1in}
+
+\lstset{
+    language=Python,
+    basicstyle=\ttfamily\small,
+    keywordstyle=\color{blue},
+    commentstyle=\color{green!60!black},
+    stringstyle=\color{orange},
+    numbers=left,
+    numberstyle=\tiny\color{gray},
+    breaklines=true,
+    frame=single,
+    backgroundcolor=\color{gray!10}
+}
+
+\newtheorem{axiom}{Axiom}
+\newtheorem{definition}{Definition}
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}{Lemma}
+\newtheorem{corollary}{Corollary}
+
+\title{\textbf{data\_proc.py} \\ Data Processing Tools \\ \large Binning and Moving Average Smoothing}
+\author{ElecSus Library Documentation}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+This document provides comprehensive documentation for \texttt{data\_proc.py}, which implements data processing utilities for experimental spectroscopy data. The module provides binning for noise reduction and moving average smoothing, essential for preparing experimental data for fitting and analysis.
+\end{abstract}
+
+\tableofcontents
+\newpage
+
+%==============================================================================
+\section{Theoretical Foundation}
+%==============================================================================
+
+\subsection{Data Binning}
+
+\begin{axiom}[Noise Reduction by Averaging]
+For $N$ independent measurements with variance $\sigma^2$, the mean has variance:
+\begin{equation}
+\text{Var}(\bar{x}) = \frac{\sigma^2}{N}
+\end{equation}
+Binning adjacent points reduces noise by $\sqrt{N_{bin}}$.
+\end{axiom}
+
+\begin{definition}[Bin Average]
+For a bin of length $b$ centered at point $i$:
+\begin{equation}
+\bar{y}_i = \frac{1}{b}\sum_{j=i-(b-1)/2}^{i+(b-1)/2} y_j
+\end{equation}
+\end{definition}
+
+\begin{theorem}[Standard Error]
+The uncertainty in the binned value is:
+\begin{equation}
+\sigma_{\bar{y}} = \frac{\text{std}(y_j \text{ in bin})}{\sqrt{b}} \approx \frac{\sigma}{\sqrt{b}}
+\end{equation}
+for stationary noise.
+\end{theorem}
+
+\subsection{Moving Average Smoothing}
+
+\begin{definition}[Simple Moving Average]
+The moving average with window size $2n+1$:
+\begin{equation}
+\tilde{y}_i = \frac{1}{2n+1}\sum_{j=i-n}^{i+n} y_j
+\end{equation}
+\end{definition}
+
+\begin{definition}[Triangular Weighted Average]
+A weighted moving average with triangular kernel:
+\begin{equation}
+\tilde{y}_i = \frac{\sum_{j=-n}^{n} w_j \cdot y_{i+j}}{\sum_{j=-n}^{n} w_j}
+\end{equation}
+where $w_j = n + 1 - |j|$ forms a triangle from 1 to $n+1$ and back.
+\end{definition}
+
+\begin{theorem}[Triangular Filter Properties]
+The triangular (tent) filter:
+\begin{itemize}
+\item Provides smoother results than boxcar (simple average)
+\item Equivalent to convolving two boxcar filters
+\item Preserves integral of the signal
+\item Reduces high-frequency noise while preserving edges better than Gaussian
+\end{itemize}
+\end{theorem}
+
+%==============================================================================
+\section{Line-by-Line Code Analysis}
+%==============================================================================
+
+\subsection{Module Imports}
+
+\begin{lstlisting}
+import numpy as np
+\end{lstlisting}
+\textit{NumPy for array operations.}
+
+\subsection{Binning Function: bin\_data}
+
+\begin{lstlisting}
+def bin_data(x,y,blength):
+    """ Takes 2 arrays x and y and bins them into groups of blength. """
+    if blength % 2 == 0: 
+        blength -= 1
+    nobins = int(len(x)/blength)
+    xmid = (blength-1)/2
+    xbinmax = nobins*blength - xmid
+\end{lstlisting}
+\textit{Force odd bin length for symmetric binning. Calculate number of complete bins.}
+
+\vspace{0.5em}
+\begin{lstlisting}
+    a=0
+    binned = np.zeros((nobins,3))
+    xout,yout,yerrout = np.array([]), np.array([]), np.array([])
+\end{lstlisting}
+\textit{Initialize output arrays for $x$, $y$, and error.}
+
+\vspace{0.5em}
+\begin{lstlisting}
+    for i in range(int(xmid),int(xbinmax),int(blength)):
+        xmin = i-int(xmid)
+        xmax = i+int(xmid)
+        xout = np.append(xout,sum(x[xmin:xmax+1])/blength)
+        yout = np.append(yout,sum(y[xmin:xmax+1])/blength)
+        yerrout = np.append(yerrout,np.std(y[xmin:xmax+1]))
+    return xout,yout,yerrout
+\end{lstlisting}
+\begin{equation}
+\bar{x}_k = \frac{1}{b}\sum_{j \in \text{bin } k} x_j, \quad \bar{y}_k = \frac{1}{b}\sum_{j \in \text{bin } k} y_j
+\end{equation}
+\begin{equation}
+\sigma_k = \text{std}(y_j : j \in \text{bin } k)
+\end{equation}
+\textit{Compute mean $x$, mean $y$, and standard deviation within each bin.}
+
+\subsection{Smoothing Function: smooth\_data}
+
+\begin{lstlisting}
+def smooth_data(data,degree,dropVals=False):
+    """performs moving triangle smoothing with a variable degree."""
+    triangle = np.array(list(range(degree))+[degree]+list(range(degree))[::-1])+1
+\end{lstlisting}
+\textit{Create triangular kernel: for degree=3, triangle = [1,2,3,4,3,2,1].}
+
+\vspace{0.5em}
+\begin{lstlisting}
+    smoothed = []
+    for i in range(degree,len(data)-degree*2):
+        point = data[i:i+len(triangle)]*triangle
+        smoothed.append(sum(point)/sum(triangle))
+\end{lstlisting}
+\begin{equation}
+\tilde{y}_i = \frac{\sum_{j} w_j \cdot y_{i+j}}{\sum_j w_j}
+\end{equation}
+\textit{Apply weighted average at each point.}
+
+\vspace{0.5em}
+\begin{lstlisting}
+    if dropVals: return smoothed
+    smoothed = [smoothed[0]]*(degree+degree/2)+smoothed
+\end{lstlisting}
+\textit{If not dropping values, pad the beginning to maintain array length.}
+
+\vspace{0.5em}
+\begin{lstlisting}
+    j = len(data)-len(smoothed)
+    if j%2==1:
+        for i in range(0,(j-1)/2):
+            smoothed.append(data[-1-(j-1)/2+i])
+            smoothed.insert(0,data[(j-1)/2-i])
+        smoothed.append(data[-1])
+    else:
+        for i in range(0,j/2):
+            smoothed.append(data[-1-i])
+            smoothed.insert(0,data[i])
+    return np.array(smoothed)
+\end{lstlisting}
+\textit{Pad end of array to match original length, using edge values.}
+
+%==============================================================================
+\section{Numerical Examples}
+%==============================================================================
+
+\subsection{Binning Example}
+
+Given 100 data points binned with $b = 5$:
+\begin{itemize}
+\item Output: 20 binned points
+\item Noise reduction: factor of $\sqrt{5} \approx 2.2$
+\item Resolution reduction: factor of 5
+\end{itemize}
+
+\subsection{Smoothing Example}
+
+For degree $= 3$:
+\begin{equation}
+\text{weights} = [1, 2, 3, 4, 3, 2, 1], \quad \sum w = 16
+\end{equation}
+\begin{equation}
+\tilde{y}_i = \frac{y_{i-3} + 2y_{i-2} + 3y_{i-1} + 4y_i + 3y_{i+1} + 2y_{i+2} + y_{i+3}}{16}
+\end{equation}
+
+%==============================================================================
+\section{Trade-offs and Considerations}
+%==============================================================================
+
+\subsection{Binning}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{ll}
+\toprule
+Advantage & Disadvantage \\
+\midrule
+Reduces noise by $\sqrt{b}$ & Reduces resolution by factor $b$ \\
+Provides error estimate & May miss narrow features \\
+Reduces data size & Information loss \\
+\bottomrule
+\end{tabular}
+\caption{Binning trade-offs}
+\end{table}
+
+\subsection{Smoothing}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{ll}
+\toprule
+Advantage & Disadvantage \\
+\midrule
+Preserves data length & Broadens sharp features \\
+Continuous output & Edge effects \\
+Adjustable degree & Correlation between points \\
+\bottomrule
+\end{tabular}
+\caption{Smoothing trade-offs}
+\end{table}
+
+%==============================================================================
+\section{Applications}
+%==============================================================================
+
+\subsection{Pre-processing for Fitting}
+
+Binning reduces the number of data points, speeding up fitting while maintaining signal quality:
+\begin{equation}
+\chi^2 = \sum_{i=1}^{N/b} \frac{(\bar{y}_i - f(\bar{x}_i))^2}{\sigma_i^2}
+\end{equation}
+
+\subsection{Noise Estimation}
+
+The standard deviation from binning provides a noise estimate:
+\begin{equation}
+\sigma_{noise} \approx \text{mean}(\sigma_k) \cdot \sqrt{b}
+\end{equation}
+
+%==============================================================================
+\section{Summary}
+%==============================================================================
+
+The \texttt{data\_proc.py} module provides:
+
+\begin{enumerate}
+\item \texttt{bin\_data(x, y, blength)}: Bin data with error estimation
+\begin{itemize}
+\item Returns: (x\_binned, y\_binned, y\_error)
+\item Bin length forced to odd for symmetry
+\end{itemize}
+
+\item \texttt{smooth\_data(data, degree, dropVals=False)}: Triangular smoothing
+\begin{itemize}
+\item Triangular kernel for smooth filtering
+\item Optional edge padding to preserve length
+\end{itemize}
+\end{enumerate}
+
+Usage:
+\begin{lstlisting}
+from data_proc import bin_data, smooth_data
+
+# Bin noisy data
+x_bin, y_bin, y_err = bin_data(x_raw, y_raw, 5)
+
+# Smooth data
+y_smooth = smooth_data(y_raw, degree=3)
+\end{lstlisting}
+
+\end{document}

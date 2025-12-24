@@ -1,0 +1,304 @@
+---
+title: "\textbf{ang\_mom.py - LaTeX Document"
+sidebar_label: "ang_mom.tex"
+sidebarLabel: "ang_mom.tex"
+tags: ["latex", "document"]
+---
+
+# \textbf{ang\_mom.py
+
+<div style={{display: 'flex', gap: '12px', flexWrap: 'wrap', marginBottom: '24px'}}>
+  <a href="/static/inbox/ang_mom.tex" download="ang_mom.tex"
+    style={{padding: '10px 20px', backgroundColor: '#10b981', color: 'white', borderRadius: '6px', textDecoration: 'none', fontWeight: 'bold'}}>
+    Download .tex
+  </a>
+  <a href="/static/inbox/ang_mom.tex" target="_blank"
+    style={{padding: '10px 20px', backgroundColor: '#008080', color: 'white', borderRadius: '6px', textDecoration: 'none', fontWeight: 'bold'}}>
+    View Raw
+  </a>
+</div>
+
+<div style={{display: 'flex', gap: '24px', marginBottom: '24px', flexWrap: 'wrap'}}>
+  <div style={{padding: '12px 16px', backgroundColor: '#f3f4f6', borderRadius: '8px'}}>
+    <div style={{fontSize: '24px', fontWeight: 'bold', color: '#008080'}}>248</div>
+    <div style={{fontSize: '12px', color: '#6b7280'}}>Lines</div>
+  </div>
+  <div style={{padding: '12px 16px', backgroundColor: '#f3f4f6', borderRadius: '8px'}}>
+    <div style={{fontSize: '24px', fontWeight: 'bold', color: '#008080'}}>6</div>
+    <div style={{fontSize: '12px', color: '#6b7280'}}>Sections</div>
+  </div>
+</div>
+
+**Author:** ElecSus Library Documentation
+
+
+
+## Abstract
+
+This document provides comprehensive documentation for \texttt{ang\_mom.py}, which constructs the matrix representations of angular momentum operators in Cartesian coordinates. These matrices are essential for computing fine structure, hyperfine structure, and Zeeman interactions in atomic physics calculations.
+
+
+
+## Sections
+
+1. Theoretical Foundation
+2. Line-by-Line Code Analysis
+3. Mathematical Properties
+4. Applications in ElecSus
+5. Numerical Verification
+6. Summary
+
+
+
+## Source Code
+
+```latex title="ang_mom.tex" showLineNumbers
+\documentclass[11pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{physics}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{geometry}
+\usepackage{hyperref}
+\usepackage{booktabs}
+
+\geometry{margin=1in}
+
+\lstset{
+    language=Python,
+    basicstyle=\ttfamily\small,
+    keywordstyle=\color{blue},
+    commentstyle=\color{green!60!black},
+    stringstyle=\color{orange},
+    numbers=left,
+    numberstyle=\tiny\color{gray},
+    breaklines=true,
+    frame=single,
+    backgroundcolor=\color{gray!10}
+}
+
+\newtheorem{axiom}{Axiom}
+\newtheorem{definition}{Definition}
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}{Lemma}
+\newtheorem{corollary}{Corollary}
+
+\title{\textbf{ang\_mom.py} \\ Angular Momentum Matrices \\ \large Cartesian Components $J_x$, $J_y$, $J_z$}
+\author{ElecSus Library Documentation}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+This document provides comprehensive documentation for \texttt{ang\_mom.py}, which constructs the matrix representations of angular momentum operators in Cartesian coordinates. These matrices are essential for computing fine structure, hyperfine structure, and Zeeman interactions in atomic physics calculations.
+\end{abstract}
+
+\tableofcontents
+\newpage
+
+%==============================================================================
+\section{Theoretical Foundation}
+%==============================================================================
+
+\subsection{Angular Momentum in Quantum Mechanics}
+
+\begin{axiom}[Hermiticity of Observables]
+Physical observables correspond to Hermitian operators. The angular momentum components $J_x$, $J_y$, $J_z$ satisfy:
+\begin{equation}
+J_i^\dagger = J_i
+\end{equation}
+\end{axiom}
+
+\begin{theorem}[Ladder Operator Decomposition]
+The Cartesian angular momentum components can be expressed in terms of ladder operators:
+\begin{align}
+J_x &= \frac{1}{2}(J_+ + J_-) \\
+J_y &= \frac{1}{2i}(J_+ - J_-) = -\frac{i}{2}(J_+ - J_-)\\
+J_z &= \frac{1}{2}[J_+, J_-]_- = \frac{1}{2}(J_+ J_- - J_- J_+)
+\end{align}
+where $J_\pm = J_x \pm iJ_y$.
+\end{theorem}
+
+\begin{proof}
+From $J_+ = J_x + iJ_y$ and $J_- = J_x - iJ_y$:
+\begin{align}
+J_+ + J_- &= 2J_x \implies J_x = \frac{1}{2}(J_+ + J_-) \\
+J_+ - J_- &= 2iJ_y \implies J_y = \frac{1}{2i}(J_+ - J_-)
+\end{align}
+For $J_z$, use $[J_+, J_-] = 2\hbar J_z$ (in units $\hbar = 1$).
+\end{proof}
+
+\begin{definition}[Adjoint Relationship]
+The lowering operator is the Hermitian adjoint of the raising operator:
+\begin{equation}
+J_- = J_+^\dagger
+\end{equation}
+For real matrix representations, this reduces to the transpose: $J_- = J_+^T$.
+\end{definition}
+
+\begin{corollary}[Hermiticity Verification]
+Using $J_- = J_+^\dagger$:
+\begin{align}
+J_x^\dagger &= \frac{1}{2}(J_+^\dagger + J_-^\dagger) = \frac{1}{2}(J_- + J_+) = J_x \\
+J_y^\dagger &= \frac{i}{2}(J_+^\dagger - J_-^\dagger) = \frac{i}{2}(J_- - J_+) = J_y
+\end{align}
+confirming $J_x$ and $J_y$ are Hermitian.
+\end{corollary}
+
+%==============================================================================
+\section{Line-by-Line Code Analysis}
+%==============================================================================
+
+\subsection{Module Imports}
+
+\begin{lstlisting}
+from numpy import transpose,dot
+import ang_mom_p
+\end{lstlisting}
+\textit{Import NumPy's transpose and dot product, plus the ladder operator module.}
+
+\subsection{The $J_x$ Function}
+
+\begin{lstlisting}
+def jx(jj):
+    jp=ang_mom_p.jp(jj)
+    jm=transpose(jp)
+    jx=0.5*(jp+jm)
+    return jx
+\end{lstlisting}
+\begin{equation}
+J_x = \frac{1}{2}(J_+ + J_-)
+\end{equation}
+\textit{Construct $J_x$ from the symmetric combination of ladder operators. The transpose gives $J_- = J_+^T$ since $J_+$ is real.}
+
+\subsection{The $J_y$ Function}
+
+\begin{lstlisting}
+def jy(jj):
+    jp=ang_mom_p.jp(jj)
+    jm=transpose(jp)
+    jy=0.5j*(jm-jp)
+    return jy
+\end{lstlisting}
+\begin{equation}
+J_y = \frac{i}{2}(J_- - J_+) = -\frac{i}{2}(J_+ - J_-)
+\end{equation}
+\textit{The antisymmetric combination with factor $i/2$ yields a Hermitian matrix. Note the sign convention: $J_y = 0.5j \cdot (J_- - J_+)$.}
+
+\subsection{The $J_z$ Function}
+
+\begin{lstlisting}
+def jz(jj):
+    jp=ang_mom_p.jp(jj)
+    jm=transpose(jp)
+    jz=0.5*(dot(jp,jm)-dot(jm,jp))
+    return jz
+\end{lstlisting}
+\begin{equation}
+J_z = \frac{1}{2}(J_+ J_- - J_- J_+) = \frac{1}{2}[J_+, J_-]
+\end{equation}
+\textit{The commutator of ladder operators gives the $z$-component. This yields a diagonal matrix with eigenvalues $m = j, j-1, \ldots, -j$.}
+
+%==============================================================================
+\section{Mathematical Properties}
+%==============================================================================
+
+\subsection{Matrix Structure}
+
+\begin{theorem}[Matrix Forms]
+For angular momentum $j$:
+\begin{itemize}
+\item $J_z$: Diagonal with entries $\{j, j-1, \ldots, -j\}$
+\item $J_x$: Real symmetric, tri-diagonal
+\item $J_y$: Purely imaginary antisymmetric (Hermitian), tri-diagonal
+\end{itemize}
+\end{theorem}
+
+\subsection{Spin-1/2 Example}
+
+For $j = 1/2$, the Pauli matrix representation (in units $\hbar = 1$):
+\begin{equation}
+J_x = \frac{1}{2}\sigma_x = \frac{1}{2}\begin{pmatrix} 0 & 1 \\ 1 & 0 \end{pmatrix}
+\end{equation}
+\begin{equation}
+J_y = \frac{1}{2}\sigma_y = \frac{1}{2}\begin{pmatrix} 0 & -i \\ i & 0 \end{pmatrix}
+\end{equation}
+\begin{equation}
+J_z = \frac{1}{2}\sigma_z = \frac{1}{2}\begin{pmatrix} 1 & 0 \\ 0 & -1 \end{pmatrix}
+\end{equation}
+
+\subsection{Verification of Commutation Relations}
+
+The constructed matrices satisfy:
+\begin{equation}
+[J_x, J_y] = iJ_z, \quad [J_y, J_z] = iJ_x, \quad [J_z, J_x] = iJ_y
+\end{equation}
+(in units where $\hbar = 1$).
+
+%==============================================================================
+\section{Applications in ElecSus}
+%==============================================================================
+
+\subsection{Fine Structure Interaction}
+
+The spin-orbit coupling uses:
+\begin{equation}
+H_{FS} = A_{FS} \vec{L} \cdot \vec{S} = A_{FS}(L_x S_x + L_y S_y + L_z S_z)
+\end{equation}
+
+\subsection{Hyperfine Structure}
+
+The magnetic dipole hyperfine interaction:
+\begin{equation}
+H_{HFS} = A_{HFS} \vec{I} \cdot \vec{J} = A_{HFS}(I_x J_x + I_y J_y + I_z J_z)
+\end{equation}
+
+\subsection{Zeeman Interaction}
+
+The magnetic field coupling:
+\begin{equation}
+H_Z = \mu_B B_z (g_L L_z + g_S S_z + g_I I_z)
+\end{equation}
+uses the $z$-components directly for fields along $\hat{z}$.
+
+%==============================================================================
+\section{Numerical Verification}
+%==============================================================================
+
+\subsection{Total Angular Momentum Squared}
+
+The identity $J^2 = j(j+1)\mathbb{1}$ can verify correctness:
+\begin{equation}
+J^2 = J_x^2 + J_y^2 + J_z^2 = j(j+1) \mathbb{1}_{(2j+1)\times(2j+1)}
+\end{equation}
+
+\subsection{Eigenvalue Check}
+
+$J_z$ should have eigenvalues $\{j, j-1, \ldots, -j\}$ appearing on the diagonal in descending order.
+
+%==============================================================================
+\section{Summary}
+%==============================================================================
+
+The \texttt{ang\_mom.py} module provides:
+
+\begin{enumerate}
+\item \texttt{jx(j)}: Returns $(2j+1) \times (2j+1)$ matrix for $J_x$
+\item \texttt{jy(j)}: Returns $(2j+1) \times (2j+1)$ matrix for $J_y$  
+\item \texttt{jz(j)}: Returns $(2j+1) \times (2j+1)$ matrix for $J_z$
+\end{enumerate}
+
+Key features:
+\begin{itemize}
+\item Uses ladder operator construction for numerical stability
+\item Works for any half-integer or integer $j$
+\item Matrices satisfy $\text{SU}(2)$ algebra
+\item Called by \texttt{fs\_hfs.py} and \texttt{sz\_lsi.py} for building atomic Hamiltonians
+\end{itemize}
+
+\end{document}
+
+```
